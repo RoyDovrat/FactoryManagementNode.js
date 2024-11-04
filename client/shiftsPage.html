@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            const shiftURL = 'http://localhost:3000/shifts';
+            const employeesURL = 'http://localhost:3000/employees';
+            const employeeShiftURL = 'http://localhost:3000/employeeShifts';
+
+            //------return all the shift data------
+            const getShifts = async () => {
+                const token = sessionStorage.getItem('token');
+
+                const resp = await fetch(shiftURL, {
+                    headers: { 'x-access-token': token },
+                });
+
+                return await resp.json();
+            };
+            //---------------------------------------------
+
+            //------return all the employees data------
+            const getEmployees = async (departmentId = '') => {
+                const token = sessionStorage.getItem('token');
+                const url = departmentId ? `${employeesURL}?departmentId=${departmentId}` : employeesURL;
+
+                const resp = await fetch(url, {
+                    headers: { 'x-access-token': token },
+                });
+
+                return await resp.json()
+            };
+            //------------------------------------------
+
+
+            //------add information to shifts table------
+            const shiftsTableInfo = async () => {
+                const shiftData = await getShifts();
+        
+                const shiftsTable = document.getElementById('shiftsTable');
+                shiftsTable.innerHTML = '';
+
+                shiftData.forEach(shift => {
+                            const date = new Date(shift.Date).toLocaleDateString('en-US');
+                            const currShift = `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
+
+                            const row = document.createElement('tr');
+                            row.innerHTML = `<td>${currShift}</td>`;
+                            shiftsTable.appendChild(row);
+                    });   
+            };
+            //--------------------------------------------------
+
+            //------add new shift------
+            const addShift = async () => {
+                const token = sessionStorage.getItem('token');
+
+                const newShift = {
+                    Date: document.getElementById('shiftDate').value,
+                    StartingHour: Number(document.getElementById('StartingHour').value),
+                    EndingHour: Number(document.getElementById('EndingHour').value),
+                };
+
+                // Send POST request
+                const resp = await fetch(shiftURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-access-token': token,
+                    },
+                    body: JSON.stringify(newShift)
+                });
+
+                if (resp.ok) {
+                    alert('New shift successfully added');
+                    await shiftsTableInfo();
+                } else {
+                    alert('Failed to add new shift. Please try again.');
+                }
+            }
+
+            //--------------------------------------------------
+
+            //------add options to shifts drop down------
+            const shiftsDropdownData = async () => {
+                 const shiftsData = await getShifts();
+                
+                const shiftsDropdown = document.getElementById('shiftsDropdown');
+                shiftsDropdown.innerHTML = '<option value="">All Shifts</option>'; // Default option
+
+                shiftsData.forEach(shift => {
+                        const date = new Date(shift.Date).toLocaleDateString('en-US');
+                        const currShift = `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
+                        shiftsDropdown.innerHTML += `<option value="${shift._id}">${currShift}</option>`;
+                });
+            };
+
+            //--------------------------------------------------
+
+            //------add options to employees drop down------
+            const employeessDropdownData = async () => {
+                 const employeessData = await getEmployees();
+                
+                const employeesDropdown = document.getElementById('employeesDropdown');
+                employeesDropdown.innerHTML = '<option value="">All Employees</option>'; // Default option
+
+                employeessData.forEach(employee => {
+                    employeesDropdown.innerHTML += `<option value="${employee._id}">${employee.fullName}</option>`;
+                });
+            };
+
+            //--------------------------------------------------
+
+            //------ save employee shift ------
+            const saveEmployeeShift = async () => {
+                const token = sessionStorage.getItem('token');
+
+                const newEmployeeShift = {
+                    ShiftID: document.getElementById('shiftsDropdown').value,
+                    EmployeeID: document.getElementById('employeesDropdown').value
+                };
+
+                // Send POST request
+                const resp = await fetch(employeeShiftURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-access-token': token,
+                    },
+                    body: JSON.stringify(newEmployeeShift)
+                });
+
+                if (resp.ok) {
+                    alert('employee shift successfully added');
+                    await shiftsTableInfo();
+                } else {
+                    alert('Failed to add employee shift. Please try again.');
+                }
+            }
+
+            //---------------------------------
+
+            //------add options to edit shifts drop down------ 
+            const editShiftsDropdownData = async () => {
+                const shiftsData = await getShifts();
+
+                const editShiftsDropdown = document.getElementById('editShiftsDropdown');
+                editShiftsDropdown.innerHTML = '<option value="">Select Shift</option>'; // Default option
+
+                shiftsData.forEach(shift => {
+                    const date = new Date(shift.Date).toLocaleDateString('en-US');
+                    const currShift = `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
+                    editShiftsDropdown.innerHTML += `<option value="${shift._id}">${currShift}</option>`;
+                });
+            };
+
+            const pageDisplay = async () => {
+              const token = sessionStorage.getItem('token');
+              const fullName = sessionStorage.getItem('fullName');
+
+            if (!token) {
+                alert("Please log in first.");
+                location.href = 'loginPage.html'; 
+            } else {
+                document.getElementById('fullName').innerText = fullName;
+                await shiftsTableInfo();
+                await shiftsDropdownData();
+                await employeessDropdownData();
+                await editShiftsDropdownData();
+                
+            }       
+        }
+        //------ update existing shift ------ 
+        const updateShift = async () => {
+            const token = sessionStorage.getItem('token');
+            const shiftId = document.getElementById('editShiftsDropdown').value;
+
+            const updatedShift = {
+                Date: document.getElementById('editShiftDate').value,
+                StartingHour: Number(document.getElementById('editStartingHour').value),
+                EndingHour: Number(document.getElementById('editEndingHour').value),
+            };
+
+            // Send PUT request
+            const resp = await fetch(`${shiftURL}/${shiftId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token,
+                },
+                body: JSON.stringify(updatedShift)
+            });
+
+            if (resp.ok) {
+                alert('Shift successfully updated');
+                await shiftsTableInfo();
+                await editShiftsDropdownData(); // Refresh the dropdown
+            } else {
+                alert('Failed to update shift. Please try again.');
+            }
+        };
+        
+        //------user log out------ 
+        function logout() {
+            sessionStorage.clear();
+            location.href = 'loginPage.html'; 
+        };
+        //-------------------------
+
+        </script>
+    </head>
+
+    <body onload="pageDisplay()">
+        <!-- Display user's full name -->
+        <p>Welcome, <span id="fullName"></span></p>
+        <!------------------------------>
+
+        <!--log out option-->
+        <a href="" onclick="logout()">Log Out</a><br><br>
+        <!------------------>
+
+        <!-- Table of all employee shift -->
+        All Shifts:<table border="1">
+        <thead>
+            <tr>
+                <th>Shifts</th>
+            </tr>
+            </thead>
+            <tbody id="shiftsTable">
+            </tbody>
+        </table> <br><br>
+        <!--------------------------->
+
+        <!--form and button to add shift-->
+        Add New Shift: <br><br>
+        <form id="shiftForm">
+            Date: <input type="date" id="shiftDate" required>
+            <br><br>
+            Starting Hour: <input type="number" min="0" max="23" id="StartingHour" required>
+            <br><br>
+            Ending Hour: <input type="number" min="0" max="23" id="EndingHour" required>
+            <br><br>
+        </form>
+        
+        <button type="button" onclick="addShift()">Save New Shift</button><br><br> <br><br>
+        <!------------------>
+
+        <!-- allocate employees to exists shift-->
+        Allocate Employees To Shift: <br><br>
+        Choose shift: <select id="shiftsDropdown">
+            <option value="">All Shifts</option> 
+        </select> <br>
+        
+        Choose Employee:<select id="employeesDropdown">
+            <option value="">All Employees</option> 
+        </select> <br>
+
+        <button type="button" onclick="saveEmployeeShift()">Save</button> <br><br>
+        <!---------->
+        
+        <!-- Edit Existing Shift: -->
+        Edit Shift: <br><br>
+        Choose shift to edit: <select id="editShiftsDropdown">
+            <option value="">Select Shift</option>
+        </select> <br>
+
+        <form id="editShiftForm"></form>
+            Date: <input type="date" id="editShiftDate" required>
+            <br><br>
+            Starting Hour: <input type="number" min="0" max="23" id="editStartingHour" required>
+            <br><br>
+            Ending Hour: <input type="number" min="0" max="23" id="editEndingHour" required>
+            <br><br>
+        </form>
+
+        <button type="button" onclick="updateShift()">Update Shift</button>
+        <br><br>
+        <!------------>
+
+    </body>
+
+</html>

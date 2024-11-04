@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+
+                 
+const pageDisplay = async () => {
+              const token = sessionStorage.getItem('token');
+              const fullName = sessionStorage.getItem('fullName');
+
+            if (!token) {
+                alert("Please log in first.");
+                location.href = 'loginPage.html'; 
+            } else {
+                document.getElementById('fullName').innerText = fullName;
+            }       
+        }
+
+        
+        //------user log out------ 
+        function logout() {
+            sessionStorage.clear();
+            location.href = 'loginPage.html'; 
+        };
+        //-------------------------
+
+        </script>
+    </head>
+
+    <body onload="pageDisplay()">
+                    
+        <!-- Display user's full name -->
+        <p>Welcome, <span id="fullName"></span></p>
+        <!------------------------------>
+
+        <!--log out option-->
+        <a href="" onclick="logout()">Log Out</a><br><br>
+        <!------------------>
+
+        <button onclick="location.href='employeePage.html'">Employees Data</button> <br><br>
+        <button onclick="location.href='departmentPage.html'">Departments Data</button> <br><br>
+        <button onclick="location.href='usersPage.html'">Users Data</button> <br><br>
+        <button onclick="location.href='shiftsPage.html'">Shifts Data</button> <br><br>
+
+
+    </body>
+</html>

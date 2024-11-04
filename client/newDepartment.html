@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            const employeesURL = 'http://localhost:3000/employees';
+            const departmentsURL = 'http://localhost:3000/departments';
+
+            
+            //------return all the employees data------
+            const getEmployees = async (departmentId = '') => {
+                const token = sessionStorage.getItem('token');
+                const url = departmentId ? `${employeesURL}?departmentId=${departmentId}` : employeesURL;
+
+                const resp = await fetch(url, {
+                    headers: { 'x-access-token': token },
+                });
+
+                return await resp.json()
+            };
+            //------------------------------------------
+
+            
+            //------ add new Department ------
+            const addDepartment = async () => {
+                const token = sessionStorage.getItem('token');
+
+                const managerName = document.getElementById('managerDepartmentName').value;
+                const employeesData = await getEmployees();
+                const manager = employeesData.find(emp => `${emp.FirstName} ${emp.LastName}` === managerName)
+                if (!manager) {
+                    alert('Manager not found. Please ensure the name is correct.');
+                    return;
+                }
+    
+                const updatedDepartment = {
+                    Name: document.getElementById('departmentName').value,
+                    Manager: manager._id 
+                };
+
+                
+                const resp = await fetch(departmentsURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-access-token': token,
+                    },
+                    body: JSON.stringify(updatedDepartment)
+                });
+
+                if (resp.ok) {
+                    alert('New department successfully added');
+                } else {
+                    alert('Failed to add new department. Please try again.');
+                }
+            };
+            //-----------------------------------------------------
+            
+            //------back to employees page ------
+            const cancel = () => {
+                location.href = 'departmentPage.html'; 
+            };
+            //-----------------------------------
+
+            const pageDisplay = async () => {
+                const token = sessionStorage.getItem('token');
+                const fullName = sessionStorage.getItem('fullName');
+
+                if (!token) {
+                    alert("Please log in first.");
+                    location.href = 'loginPage.html'; 
+                } else {
+                    document.getElementById('fullName').innerText = fullName;
+                }       
+            };
+
+            //------user log out------ 
+            function logout() {
+                sessionStorage.clear();
+                location.href = 'loginPage.html'; 
+            };
+            //-------------------------
+
+        </script>
+    </head>
+
+    <body onload="pageDisplay()">
+        <h1>New Employees Page</h1>
+
+        <!-- Display user's full name -->
+        <p>Welcome, <span id="fullName"></span></p>
+        <!------------------------------>
+
+        <!--log out option-->
+        <a href="" onclick="logout()">Log Out</a><br><br>
+        <!------------------>
+
+          <!--form to add employee-->
+        <form id="employeeForm">
+            Name: <input type="text" id="departmentName" required>
+            <br><br>
+            Manager Name: <input type="text" id="managerDepartmentName" required>
+            </select> <br><br>
+        </form>
+        <!------------------>
+
+        <button type="button" onclick="addDepartment()">Save</button>
+        <button type="button" onclick="cancel()">Cancel</button>
+
+    </body>
+</html>

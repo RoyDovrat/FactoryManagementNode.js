@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            const employeesURL = 'http://localhost:3000/employees';
+            const departmentsURL = 'http://localhost:3000/departments';
+
+            //------return all the employees data------
+            const getEmployees = async () => {
+                const token = sessionStorage.getItem('token');
+                const resp = await fetch(employeesURL, {
+                    headers: { 'x-access-token': token },
+                });
+                const data = await resp.json();
+                console.log('Employees:', data); // Log to verify data
+                return data;
+            };
+            //------------------------------------------
+
+            //------return all the departments data------
+            const getDepartments = async () => {
+                const token = sessionStorage.getItem('token');
+                const resp = await fetch(departmentsURL, {
+                    headers: { 'x-access-token': token },
+                });
+                const data = await resp.json();
+                console.log('Departments:', data); 
+                return data;
+            };
+            //---------------------------------------------
+
+            //------add information to department table------
+            const departmentTableInfo = async () => {
+                const employeesData = await getEmployees();
+                const departmentsData = await getDepartments();
+                const departmentTable = document.getElementById('departmentTable');
+                departmentTable.innerHTML = '';
+
+                departmentsData.forEach(department => {
+                    const row = document.createElement('tr');
+                    const departmentEmployees = employeesData.filter(emp => emp.DepartmentID === department._id);
+
+                    const manager = employeesData.find(emp => emp._id === department.ManagerID);
+                    const managerName = manager ? `${manager.FirstName} ${manager.LastName}` : 'Unknown';
+
+                    const employeesNames = departmentEmployees.map(employee => 
+                        `<a href="editEmployee.html?id=${employee._id}">${employee.FirstName} ${employee.LastName}</a>`
+                    ).join(', '); 
+
+                    row.innerHTML = `
+                        <td><a href="editDepartment.html?id=${department._id}">${department.Name}</a></td>
+                        <td>${managerName}</td>
+                        <td>${employeesNames}</td>
+                    `;
+                    departmentTable.appendChild(row);
+                });
+            };
+            //--------------------------------------------------
+
+            const pageDisplay = async () => {
+                const token = sessionStorage.getItem('token');
+                const fullName = sessionStorage.getItem('fullName');
+
+                if (!token) {
+                    alert("Please log in first.");
+                    location.href = 'loginPage.html'; 
+                } else {
+                    document.getElementById('fullName').innerText = fullName;
+                    await departmentTableInfo(); 
+                }
+            };
+
+            //------user log out------ 
+            function logout() {
+                sessionStorage.clear();
+                location.href = 'loginPage.html'; 
+            };
+            //-------------------------
+        </script>
+    </head>
+
+    <body onload="pageDisplay()">
+        <h1>Department Page</h1>
+
+        <!-- Display user's full name -->
+        <p>Welcome, <span id="fullName"></span></p>
+        <!------------------------------>
+
+        <!--log out option-->
+        <a href="#" onclick="logout()">Log Out</a><br><br>
+        <!------------------->
+
+        <!-- Table of departments -->
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Department name</th>
+                    <th>Department manager name</th>
+                    <th>Employees names</th>
+                </tr>
+            </thead>
+            <tbody id="departmentTable">
+            </tbody>
+        </table> <br><br>
+        <!------------------->
+
+        <!-- add new depatment -->
+        <button onclick="location.href='newDepartment.html'">Add Department</button> 
+        <!---------------------->
+
+    </body>
+</html>

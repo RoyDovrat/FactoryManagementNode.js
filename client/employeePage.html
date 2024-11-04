@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+   
+   
+    <head>
+        <script>
+            const employeesURL = 'http://localhost:3000/employees';
+            const departmentsURL = 'http://localhost:3000/departments';
+            const employeeShiftURL = 'http://localhost:3000/employeeShifts';
+            const shiftURL = 'http://localhost:3000/shifts';
+
+            //------return all the employees data------
+            const getEmployees = async (departmentId = '') => {
+                const token = sessionStorage.getItem('token');
+                const url = departmentId ? `${employeesURL}?departmentId=${departmentId}` : employeesURL;
+
+                const resp = await fetch(url, {
+                    headers: { 'x-access-token': token },
+                });
+
+                return await resp.json()
+            };
+            //------------------------------------------
+
+
+            //------return all the departments data------
+            const getDepartments = async () => {
+            const token = sessionStorage.getItem('token');
+
+            const resp = await fetch(departmentsURL, {
+                headers: { 'x-access-token': token },
+            });
+
+            return await resp.json();
+            };
+            //---------------------------------------------
+
+            //------return all the employee shift data------
+            const getEmployeeShift = async () => {
+                const token = sessionStorage.getItem('token');
+
+                const resp = await fetch(employeeShiftURL, {
+                    headers: { 'x-access-token': token },
+                });
+
+                return await resp.json();
+            };
+            //---------------------------------------------
+
+            //------return all the shift data------
+            const getShift = async () => {
+                const token = sessionStorage.getItem('token');
+
+                const resp = await fetch(shiftURL, {
+                    headers: { 'x-access-token': token },
+                });
+
+                return await resp.json();
+            };
+            //---------------------------------------------
+
+            //------add information to employees table------
+            const EmployeeTableInfo = async (departmentId = '') => {
+                const employeesData = await getEmployees(departmentId);
+                const departmentsData = await getDepartments();
+                const employeeShiftsData = await getEmployeeShift();
+                const shiftData = await getShift();
+        
+                const employeeTable = document.getElementById('employeeTable');
+                employeeTable.innerHTML = '';
+
+                employeesData.forEach(employee => {
+                    const department = departmentsData.find(dep => dep._id === employee.DepartmentID);
+                    const departmentName = department ? department.Name : 'Unknown';
+
+                    const employeeShifts = employeeShiftsData.filter(es => es.EmployeeID === employee._id);
+
+                    const shiftsInfo = employeeShifts.map(employeeShift => {
+                        const shift = shiftData.find(s => s._id === employeeShift.ShiftID);
+                        
+                        if (shift) {
+                            const date = new Date(shift.Date).toLocaleDateString('en-US');
+                            return `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
+                        }
+                        return 'No shift info';
+                    }).join('<br>');
+                        
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><a href="editEmployee.html?id=${employee._id}">${employee.fullName}</a></td>
+                        <td><a href="editDepartment.html?id=${employee.DepartmentID}">${departmentName}</a></td>
+                        <td>${shiftsInfo}</td>
+                    `;
+                    
+                    employeeTable.appendChild(row);
+            });
+        };
+            //--------------------------------------------------
+
+            //------add options to departments drop down------
+            const DepartmentDropdownData = async () => {
+                
+                const departmentsData = await getDepartments();
+                const departmentDropdown = document.getElementById('departmentDropdown');
+                departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
+
+                departmentsData.forEach(department => {
+                    const option = document.createElement('option');
+                    departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
+                });
+            };
+            //--------------------------------------------------
+
+            //------Activated when the departments drop down selection changes------
+            const filterEmployeesByDepartment = () => {
+            const selectedDepartmentId = document.getElementById('departmentDropdown').value;
+            EmployeeTableInfo(selectedDepartmentId);
+            };
+            //----------------------------------------------------------------------
+
+      
+            const pageDisplay = async () => {
+              const token = sessionStorage.getItem('token');
+              const fullName = sessionStorage.getItem('fullName');
+
+            if (!token) {
+                alert("Please log in first.");
+                location.href = 'loginPage.html'; 
+            } else {
+                document.getElementById('fullName').innerText = fullName;
+                await EmployeeTableInfo();
+                await DepartmentDropdownData();
+            }       
+        }
+
+        
+        //------user log out------ 
+        function logout() {
+            sessionStorage.clear();
+            location.href = 'loginPage.html'; 
+        };
+        //-------------------------
+    
+          </script>
+
+        </head>
+
+        <body onload="pageDisplay()">  <!--when the page open we want to receive the data in sessionStorage-->
+            <h1>Employees Page</h1>
+            
+            <!-- Display user's full name -->
+            <p>Welcome, <span id="fullName"></span></p>
+            <!------------------------------>
+
+            <!--log out option-->
+            <a href="" onclick="logout()">Log Out</a><br><br>
+            <!------------------>
+
+            <!--drop down with all departments. -->
+            Filter employees by Department:<select id="departmentDropdown" onchange="filterEmployeesByDepartment()">
+                <option value="">All Departments</option> 
+            </select> <br><br>
+            <!--------------------------->
+
+            <!-- Table of employees -->
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Department</th>
+                    <th>Shifts</th>
+                </tr>
+                </thead>
+                <tbody id="employeeTable">
+                </tbody>
+            </table> <br><br>
+            <!--------------------------->
+
+
+            <!-- add new employee -->
+            <button onclick="location.href='newEmployee.html'">Add Employee</button> 
+            <!---------------------->
+
+        </body>
+
+</html>
