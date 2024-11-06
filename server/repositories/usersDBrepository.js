@@ -21,10 +21,6 @@ const updateUser = (id, obj) => {
   return User.findByIdAndUpdate(id, obj);
 };
 
-// Reset user's action count (at the end of the day)
-const resetUserActions = (id, numOfActions) => {
-  return User.findByIdAndUpdate(id, { NumOfActions: numOfActions });
-};
 
 const deleteUser = (id) => {
   return User.findByIdAndDelete(id);
@@ -36,6 +32,5 @@ module.exports = {
   getUserByUsername,
   addUser,
   updateUser,
-  resetUserActions,
   deleteUser
 };

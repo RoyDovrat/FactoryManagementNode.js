@@ -23,20 +23,24 @@ const updateUser = (id, userObj) => {
   return userRepository.updateUser(id, userObj);
 };
 
-// Decrement NumOfActions after performing an action
+// Decrement remaining Num Of Actions after performing an action
 const decrementUserActions = async (userId) => {
   const user = await userRepository.getUserById(userId);
-  if (user && user.NumOfActions > 0) {
-    user.NumOfActions -= 1;
-    await user.save();
-    return user;
+  if (user && user.RemainingAllowdActions > 0) {
+    user.RemainingAllowdActions -= 1;
+    return user.save();
   }
   return null; 
 };
 
 // Reset user's action count (at the end of the day)
-const resetUserActions = (userId, numOfActions) => {
-  return userRepository.resetUserActions(userId, numOfActions);
+const resetUserActions = async () => {
+  const users = await getAllUsers();
+  const resetUsersActions = users.map(user => {
+    user.RemainingAllowdActions = user.NumOfActions;
+    return user.save();
+  });
+  return resetUsersActions;;
 };
 
 
