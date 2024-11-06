@@ -1,26 +1,25 @@
+<!DOCTYPE html>
 <html>
-  <body>
-    <h2>Login Page</h2>
-    <div>
-      Username: <input type="text" id="username" /> <br />
-      Email: <input type="email" id="email" /> <br />
-      <button onclick="login()">Login</button>
-    </div>
-    <p id="error" style="color:red"></p>
-
+  <head>
     <script>
       const url = 'http://localhost:3000/auth/login';
 
       const login = async () => {
+        
+        document.getElementById('error').innerText = ''; 
 
-        //need to send to server obj with username and email
-        const loginData = {
-          username: document.getElementById('username').value,
-          email: document.getElementById('email').value
-        };
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+
+        if (!username || !email) { // Validate inputs
+          document.getElementById('error').innerText = 'Please enter both username and email.';
+          return;
+        }
+
+        //send login request to server with obj = {username and email}
+        const loginData = {username, email};
 
         try {
-          //sending a request to the server with the obj in json form 
           const resp = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -41,5 +40,20 @@
       };
 
     </script>
+  </head>
+
+  <body>
+
+    <h2>Login Page</h2>
+    <div>
+      Username: <input type="text" id="username" required /> <br><br>
+      Email: <input type="email" id="email" required /> <br><br>
+
+      <button onclick="login()">Login</button>
+    </div>
+
+    <p id="error" style="color:red"></p>
+    
   </body>
+
 </html>

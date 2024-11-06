@@ -18,7 +18,7 @@ const addUser = (userObj) => {
   return userRepository.addUser(userObj);
 };
 
-// Update user details (for NumOfActions)
+
 const updateUser = (id, userObj) => {
   return userRepository.updateUser(id, userObj);
 };

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
    
-   
     <head>
         <script>
             const employeesURL = 'http://localhost:3000/employees';
@@ -9,62 +8,36 @@
             const employeeShiftURL = 'http://localhost:3000/employeeShifts';
             const shiftURL = 'http://localhost:3000/shifts';
 
-            //------return all the employees data------
-            const getEmployees = async (departmentId = '') => {
-                const token = sessionStorage.getItem('token');
-                const url = departmentId ? `${employeesURL}?departmentId=${departmentId}` : employeesURL;
+            let departmentsData = [];
+            let employeeShiftsData = [];
+            let shiftData = [];
 
-                const resp = await fetch(url, {
-                    headers: { 'x-access-token': token },
-                });
+            const loadData = async () => {
+                departmentsData = await fetchData(departmentsURL);
+                employeeShiftsData = await fetchData(employeeShiftURL);
+                shiftData = await fetchData(shiftURL);
+            }
 
-                return await resp.json()
-            };
-            //------------------------------------------
-
-
-            //------return all the departments data------
-            const getDepartments = async () => {
-            const token = sessionStorage.getItem('token');
-
-            const resp = await fetch(departmentsURL, {
-                headers: { 'x-access-token': token },
-            });
-
-            return await resp.json();
-            };
-            //---------------------------------------------
-
-            //------return all the employee shift data------
-            const getEmployeeShift = async () => {
+            //-------------- handle  fetch requests --------------
+            const fetchData = async (url) => {
                 const token = sessionStorage.getItem('token');
 
-                const resp = await fetch(employeeShiftURL, {
-                    headers: { 'x-access-token': token },
-                });
-
-                return await resp.json();
+                try {
+                    const resp = await fetch(`${url}`, {
+                        headers: { 'x-access-token': token },
+                    });
+                    return await resp.json();
+                } catch (error) {
+                    console.log(`Fetch error for ${url}`);
+                    alert('An error occurred while fetching data. Please try again.');
+                }
             };
-            //---------------------------------------------
+            //------------------------------------------------------
 
-            //------return all the shift data------
-            const getShift = async () => {
-                const token = sessionStorage.getItem('token');
 
-                const resp = await fetch(shiftURL, {
-                    headers: { 'x-access-token': token },
-                });
-
-                return await resp.json();
-            };
-            //---------------------------------------------
-
-            //------add information to employees table------
+            //----------- display all employees in a table ---------
             const EmployeeTableInfo = async (departmentId = '') => {
-                const employeesData = await getEmployees(departmentId);
-                const departmentsData = await getDepartments();
-                const employeeShiftsData = await getEmployeeShift();
-                const shiftData = await getShift();
+                const employeesData = await fetchData(departmentId ? `${employeesURL}?departmentId=${departmentId}` : employeesURL);
         
                 const employeeTable = document.getElementById('employeeTable');
                 employeeTable.innerHTML = '';
@@ -94,14 +67,14 @@
                     `;
                     
                     employeeTable.appendChild(row);
-            });
-        };
-            //--------------------------------------------------
+                });
+            };
+            //------------------------------------------------------
 
-            //------add options to departments drop down------
+
+            //--------- add options to departments drop down -------
             const DepartmentDropdownData = async () => {
                 
-                const departmentsData = await getDepartments();
                 const departmentDropdown = document.getElementById('departmentDropdown');
                 departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
 
@@ -110,16 +83,17 @@
                     departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
                 });
             };
-            //--------------------------------------------------
+            //------------------------------------------------------
 
-            //------Activated when the departments drop down selection changes------
+             //------------ handle department filtering ------------
             const filterEmployeesByDepartment = () => {
             const selectedDepartmentId = document.getElementById('departmentDropdown').value;
             EmployeeTableInfo(selectedDepartmentId);
             };
-            //----------------------------------------------------------------------
+            //------------------------------------------------------
 
-      
+
+            //------------------ load initial data ------------------
             const pageDisplay = async () => {
               const token = sessionStorage.getItem('token');
               const fullName = sessionStorage.getItem('fullName');
@@ -129,18 +103,22 @@
                 location.href = 'loginPage.html'; 
             } else {
                 document.getElementById('fullName').innerText = fullName;
+                await loadData();
                 await EmployeeTableInfo();
                 await DepartmentDropdownData();
             }       
         }
+        //------------------------------------------------------
 
         
-        //------user log out------ 
+        //-------------------- user log out -------------------- 
         function logout() {
-            sessionStorage.clear();
-            location.href = 'loginPage.html'; 
+            if (confirm("Are you sure you want to log out?")) {
+                sessionStorage.clear(); 
+                location.href = 'loginPage.html'; 
+            }
         };
-        //-------------------------
+        //------------------------------------------------------
     
           </script>
 
