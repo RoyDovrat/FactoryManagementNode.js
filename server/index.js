@@ -2,10 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./configs/dataBase');
 
+
 const departmentsRouter = require('./controllers/departmentController');
 const employeesRouter = require('./controllers/employeeController');
-const shifsRouter = require('./controllers/shiftController');
-const employeeShifsRouter = require('./controllers//employeeShiftController');
+const shiftsRouter = require('./controllers/shiftController');
+const employeeShiftsRouter = require('./controllers//employeeShiftController');
 
 const authController = require('./controllers/authController');
 
@@ -16,12 +17,17 @@ connectDB();
 
 app.use(cors());
 app.use('/', express.json());
+
+app.use('/auth', authController);
+
+
 app.use('/departments', departmentsRouter);
 app.use('/employees', employeesRouter);
-app.use('/shifts', shifsRouter);
-app.use('/employeeShifts', employeeShifsRouter)
+app.use('/shifts', shiftsRouter);
+app.use('/employeeShifts', employeeShiftsRouter)
 
-app.use('/auth', authController); 
+
+
 
 app.listen(PORT, () => {
   console.log(`app is listening at http://localhost:${PORT}`);
