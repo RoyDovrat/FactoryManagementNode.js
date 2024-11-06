@@ -9,6 +9,7 @@ const getUserById = (id) => {
 };
 
 const getUserByUsername = (username) => {
+  console.log('in user db repo', username)
   return User.findOne({ FullName: username });
 };
 
