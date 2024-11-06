@@ -34,4 +34,4 @@ const checkUserActionsLimit = async (req, res, next)  => {
 
 }
 
-module.exports = checkUserActionsLimit;
+module.exports = {checkUserActionsLimit};
