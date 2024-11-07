@@ -2,11 +2,8 @@
 <html>
     <head>
         <script>
-            const employeesURL = 'http://localhost:3000/employees';
+ 
             const departmentsURL = 'http://localhost:3000/departments';
-
-            let departmentsData = [];
-            let employeesData = [];
 
             //-------------- handle  fetch requests --------------
             const fetchData = async (url) => {
@@ -22,35 +19,29 @@
                     alert('An error occurred while fetching data. Please try again.');
                 }
             };
-            
-
-            const loadData = async () => {
-                departmentsData = await fetchData(departmentsURL);
-                employeesData = await fetchData(employeesURL);
-            }
+        
 
             //------add information to department table------
-            const departmentTableInfo = async () => {
+            const displayDepartmentsTable  = async () => {
+                const departments = await fetchData(`${departmentsURL}?details=true`);
                 const departmentTable = document.getElementById('departmentTable');
                 departmentTable.innerHTML = '';
 
-                departmentsData.forEach(department => {
+                departments.forEach(department => {
                     const row = document.createElement('tr');
-                    const departmentEmployees = employeesData.filter(emp => emp.DepartmentID === department._id);
 
-                    const manager = employeesData.find(emp => emp._id === department.Manager);
-                    const managerName = manager ? `${manager.FirstName} ${manager.LastName}` : 'Unknown';
-
-                    const employeesNames = departmentEmployees.map(employee => 
-                        `<a href="editEmployee.html?id=${employee._id}">${employee.FirstName} ${employee.LastName}</a>`
-                    ).join(', '); 
+                    const departmentLink = `<a href="editDepartment.html?id=${department._id}">${department.Name}</a>`;
+                    const managerName = department.managerName;
+                    const departmentEmployees = department.employeesDetails.map(employee => `<a href="editEmployee.html?id=${employee.employeeId}">${employee.employeeName}</a>`).join(', ');
 
                     row.innerHTML = `
-                        <td><a href="editDepartment.html?id=${department._id}">${department.Name}</a></td>
-                        <td>${managerName}</td>
-                        <td>${employeesNames}</td>
+                    <td>${departmentLink}</td>
+                    <td>${managerName}</td>
+                    <td>${departmentEmployees}</td>
                     `;
+
                     departmentTable.appendChild(row);
+
                 });
             };
             //--------------------------------------------------
@@ -64,17 +55,18 @@
                     location.href = 'loginPage.html'; 
                 } else {
                     document.getElementById('fullName').innerText = fullName;
-                    await loadData();
-                    await departmentTableInfo(); 
+                    await displayDepartmentsTable();
                 }
             };
 
-            //------user log out------ 
+            //-------------------- user log out -------------------- 
             function logout() {
-                sessionStorage.clear();
-                location.href = 'loginPage.html'; 
+                if (confirm("Are you sure you want to log out?")) {
+                    sessionStorage.clear(); 
+                    location.href = 'loginPage.html'; 
+                }
             };
-            //-------------------------
+            //------------------------------------------------------
         </script>
     </head>
 

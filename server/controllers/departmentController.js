@@ -10,8 +10,17 @@ const router = express.Router();
 router.get('/', verifyToken, async (req, res) => {
   
     try {
-      const filters = req.query;
-      const departments = await departmentsService.getAllDepartments(filters);
+
+      const { details } = req.query;
+      let departments;
+
+      if (details === 'true') {
+          
+          departments = await departmentsService.getDepartmentsWithEmployees(); // URL: http://localhost:3000/departments?details=true
+      } else {
+          
+          departments = await departmentsService.getAllDepartments(); // URL: http://localhost:3000/departments
+      }
       res.json(departments);
     } catch (error) {
       res.json(error);
