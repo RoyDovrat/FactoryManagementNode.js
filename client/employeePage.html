@@ -12,12 +12,6 @@
             let employeeShiftsData = [];
             let shiftData = [];
 
-            const loadData = async () => {
-                departmentsData = await fetchData(departmentsURL);
-                employeeShiftsData = await fetchData(employeeShiftURL);
-                shiftData = await fetchData(shiftURL);
-            }
-
             //-------------- handle  fetch requests --------------
             const fetchData = async (url) => {
                 const token = sessionStorage.getItem('token');
@@ -32,6 +26,13 @@
                     alert('An error occurred while fetching data. Please try again.');
                 }
             };
+            
+
+            const loadData = async () => {
+                departmentsData = await fetchData(departmentsURL);
+                employeeShiftsData = await fetchData(employeeShiftURL);
+                shiftData = await fetchData(shiftURL);
+            }
             //------------------------------------------------------
 
 

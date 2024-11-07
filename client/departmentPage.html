@@ -5,34 +5,32 @@
             const employeesURL = 'http://localhost:3000/employees';
             const departmentsURL = 'http://localhost:3000/departments';
 
-            //------return all the employees data------
-            const getEmployees = async () => {
-                const token = sessionStorage.getItem('token');
-                const resp = await fetch(employeesURL, {
-                    headers: { 'x-access-token': token },
-                });
-                const data = await resp.json();
-                console.log('Employees:', data); // Log to verify data
-                return data;
-            };
-            //------------------------------------------
+            let departmentsData = [];
+            let employeesData = [];
 
-            //------return all the departments data------
-            const getDepartments = async () => {
+            //-------------- handle  fetch requests --------------
+            const fetchData = async (url) => {
                 const token = sessionStorage.getItem('token');
-                const resp = await fetch(departmentsURL, {
-                    headers: { 'x-access-token': token },
-                });
-                const data = await resp.json();
-                console.log('Departments:', data); 
-                return data;
+
+                try {
+                    const resp = await fetch(`${url}`, {
+                        headers: { 'x-access-token': token },
+                    });
+                    return await resp.json();
+                } catch (error) {
+                    console.log(`Fetch error for ${url}`);
+                    alert('An error occurred while fetching data. Please try again.');
+                }
             };
-            //---------------------------------------------
+            
+
+            const loadData = async () => {
+                departmentsData = await fetchData(departmentsURL);
+                employeesData = await fetchData(employeesURL);
+            }
 
             //------add information to department table------
             const departmentTableInfo = async () => {
-                const employeesData = await getEmployees();
-                const departmentsData = await getDepartments();
                 const departmentTable = document.getElementById('departmentTable');
                 departmentTable.innerHTML = '';
 
@@ -40,7 +38,7 @@
                     const row = document.createElement('tr');
                     const departmentEmployees = employeesData.filter(emp => emp.DepartmentID === department._id);
 
-                    const manager = employeesData.find(emp => emp._id === department.ManagerID);
+                    const manager = employeesData.find(emp => emp._id === department.Manager);
                     const managerName = manager ? `${manager.FirstName} ${manager.LastName}` : 'Unknown';
 
                     const employeesNames = departmentEmployees.map(employee => 
@@ -66,6 +64,7 @@
                     location.href = 'loginPage.html'; 
                 } else {
                     document.getElementById('fullName').innerText = fullName;
+                    await loadData();
                     await departmentTableInfo(); 
                 }
             };

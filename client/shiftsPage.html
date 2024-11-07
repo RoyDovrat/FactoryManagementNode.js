@@ -6,39 +6,38 @@
             const employeesURL = 'http://localhost:3000/employees';
             const employeeShiftURL = 'http://localhost:3000/employeeShifts';
 
-            //------return all the shift data------
-            const getShifts = async () => {
+            let employeesData = [];
+            let shiftData = [];
+
+            //-------------- handle  fetch requests --------------
+            const fetchData = async (url) => {
                 const token = sessionStorage.getItem('token');
 
-                const resp = await fetch(shiftURL, {
-                    headers: { 'x-access-token': token },
-                });
-
-                return await resp.json();
+                try {
+                    const resp = await fetch(`${url}`, {
+                        headers: { 'x-access-token': token },
+                    });
+                    return await resp.json();
+                } catch (error) {
+                    console.log(`Fetch error for ${url}`);
+                    alert('An error occurred while fetching data. Please try again.');
+                }
             };
-            //---------------------------------------------
-
-            //------return all the employees data------
-            const getEmployees = async (departmentId = '') => {
-                const token = sessionStorage.getItem('token');
-                const url = departmentId ? `${employeesURL}?departmentId=${departmentId}` : employeesURL;
-
-                const resp = await fetch(url, {
-                    headers: { 'x-access-token': token },
-                });
-
-                return await resp.json()
-            };
-            //------------------------------------------
+            
+            const loadData = async () => {
+                employeesData = await fetchData(employeesURL);
+                shiftData = await fetchData(shiftURL);
+            }
+            //------------------------------------------------------
 
 
             //------add information to shifts table------
             const shiftsTableInfo = async () => {
-                const shiftData = await getShifts();
         
                 const shiftsTable = document.getElementById('shiftsTable');
                 shiftsTable.innerHTML = '';
-
+                console.log('shifts',shiftData)
+                
                 shiftData.forEach(shift => {
                             const date = new Date(shift.Date).toLocaleDateString('en-US');
                             const currShift = `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
@@ -80,34 +79,30 @@
 
             //--------------------------------------------------
 
-            //------add options to shifts drop down------
+            //------add options to dropdown------
+            const populateDropdown = (dropdownId, data, defaultOptionText, displayTextCallback) => {
+                const dropdown = document.getElementById(dropdownId);
+                dropdown.innerHTML = `<option value="">${defaultOptionText}</option>`;
+                
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item._id;
+                    option.textContent = displayTextCallback(item);
+                    dropdown.appendChild(option);
+                });
+            };
+
             const shiftsDropdownData = async () => {
-                 const shiftsData = await getShifts();
-                
-                const shiftsDropdown = document.getElementById('shiftsDropdown');
-                shiftsDropdown.innerHTML = '<option value="">All Shifts</option>'; // Default option
-
-                shiftsData.forEach(shift => {
-                        const date = new Date(shift.Date).toLocaleDateString('en-US');
-                        const currShift = `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
-                        shiftsDropdown.innerHTML += `<option value="${shift._id}">${currShift}</option>`;
-                });
+                await loadData();
+                populateDropdown('shiftsDropdown', shiftData, 'All Shifts', shift => 
+                    `${new Date(shift.Date).toLocaleDateString('en-US')}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`
+                );
             };
 
-            //--------------------------------------------------
-
-            //------add options to employees drop down------
-            const employeessDropdownData = async () => {
-                 const employeessData = await getEmployees();
-                
-                const employeesDropdown = document.getElementById('employeesDropdown');
-                employeesDropdown.innerHTML = '<option value="">All Employees</option>'; // Default option
-
-                employeessData.forEach(employee => {
-                    employeesDropdown.innerHTML += `<option value="${employee._id}">${employee.fullName}</option>`;
-                });
+            const employeesDropdownData = async () => {
+                await loadData();
+                populateDropdown('employeesDropdown', employeesData, 'All Employees', employee => employee.fullName);
             };
-
             //--------------------------------------------------
 
             //------ save employee shift ------
@@ -141,12 +136,11 @@
 
             //------add options to edit shifts drop down------ 
             const editShiftsDropdownData = async () => {
-                const shiftsData = await getShifts();
 
                 const editShiftsDropdown = document.getElementById('editShiftsDropdown');
                 editShiftsDropdown.innerHTML = '<option value="">Select Shift</option>'; // Default option
 
-                shiftsData.forEach(shift => {
+                shiftData.forEach(shift => {
                     const date = new Date(shift.Date).toLocaleDateString('en-US');
                     const currShift = `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
                     editShiftsDropdown.innerHTML += `<option value="${shift._id}">${currShift}</option>`;
@@ -162,9 +156,10 @@
                 location.href = 'loginPage.html'; 
             } else {
                 document.getElementById('fullName').innerText = fullName;
+                await loadData();
                 await shiftsTableInfo();
                 await shiftsDropdownData();
-                await employeessDropdownData();
+                await employeesDropdownData();
                 await editShiftsDropdownData();
                 
             }       
@@ -201,8 +196,10 @@
         
         //------user log out------ 
         function logout() {
-            sessionStorage.clear();
-            location.href = 'loginPage.html'; 
+            if (confirm("Are you sure you want to log out?")) {
+                sessionStorage.clear(); 
+                location.href = 'loginPage.html'; 
+            }
         };
         //-------------------------
 

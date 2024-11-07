@@ -7,70 +7,38 @@
             const employeeShiftURL = 'http://localhost:3000/employeeShifts';
             const shiftURL = 'http://localhost:3000/shifts';
 
-            //------- return employee data by ID------
-            const getEmployeeData = async (employeeId) => {
+            let departmentsData = [];
+            let employeeShiftsData= [];
+            let shiftsData = [];
+            let employeeData = [];
+
+            const loadData = async (employeeId) => {
+                departmentsData = await fetchData(departmentsURL);
+                shiftsData = await fetchData(shiftURL);
+                employeeShiftsData = await fetchData(employeeShiftURL);
+                employeeData = await fetchData(`${employeesURL}/${employeeId}`);
+            }
+
+
+            //-------------- handle  fetch requests --------------
+            const fetchData = async (url) => {
                 const token = sessionStorage.getItem('token');
-                const resp = await fetch(`${employeesURL}/${employeeId}`, {
-                    headers: { 'x-access-token': token },
-                });
 
-                return await resp.json();
-            };
-            //-----------------------------------------
-
-            
-            //------return department data by ID------
-            const getDepartment = async (departmentId) => {
-                const token = sessionStorage.getItem('token');
-
-                const resp = await fetch(`${departmentsURL}/${departmentId}`, {
+                try {
+                    const resp = await fetch(`${url}`, {
                         headers: { 'x-access-token': token },
                     });
-
-                return await resp.json();
+                    return await resp.json();
+                } catch (error) {
+                    console.log(`Fetch error for ${url}`);
+                    alert('An error occurred while fetching data. Please try again.');
+                }
             };
-            //---------------------------------------------
+            //------------------------------------------------------
 
             
-            //------return all the departments data------
-            const getDepartments = async () => {
-            const token = sessionStorage.getItem('token');
-
-            const resp = await fetch(departmentsURL, {
-                headers: { 'x-access-token': token },
-            });
-
-            return await resp.json();
-            };
-            //---------------------------------------------
-
-            //------return all the employee shift data------
-            const getEmployeeShift = async () => {
-                const token = sessionStorage.getItem('token');
-
-                const resp = await fetch(employeeShiftURL, {
-                    headers: { 'x-access-token': token },
-                });
-
-                return await resp.json();
-            };
-            //---------------------------------------------
-
-            //------return all the shift data------
-            const getShifts = async () => {
-                const token = sessionStorage.getItem('token');
-
-                const resp = await fetch(shiftURL, {
-                    headers: { 'x-access-token': token },
-                });
-
-                return await resp.json();
-            };
-            //---------------------------------------------
-
-            //------add options to departments drop down------
+            //------ add options to departments drop down ------
             const DepartmentDropdownData = async (currentDepartmentId) => {
-                const departmentsData = await getDepartments();
                 const departmentDropdown = document.getElementById('departmentDropdown');
                 departmentDropdown.innerHTML = ''; 
 
@@ -88,33 +56,26 @@
             //------add the employee's current information in form------
             const formInitialize = async (employeeId) => {
 
-                const employee = await getEmployeeData(employeeId);
-                const departmentId = employee.DepartmentID;
-                const departmentData = await getDepartment(departmentId);
+                const departmentId = employeeData.DepartmentID;
+                const departmentData = await fetchData(`${departmentsURL}/${departmentId}`);
 
-                document.getElementById('employeeFirstName').value = employee.FirstName;
-                document.getElementById('employeeLastName').value = employee.LastName;
-                document.getElementById('startWorkYear').value = employee.StartWorkYear;
+                document.getElementById('employeeFirstName').value = employeeData.FirstName;
+                document.getElementById('employeeLastName').value = employeeData.LastName;
+                document.getElementById('startWorkYear').value = employeeData.StartWorkYear;
 
                 await DepartmentDropdownData(departmentId);
             }
 
              //------add information to employee shift table------
-             const EmployeeTableInfo = async () => {
-                const employeeId = new URLSearchParams(location.search).get('id');
-                const employeeData = await getEmployeeData(employeeId);
-
-                const employeeShiftsData = await getEmployeeShift();
-                const shiftData = await getShifts();
-                
-        
+             const EmployeeTableInfo = async (employeeId) => {
+   
                 const employeeShiftTable = document.getElementById('employeeShiftTable');
                 employeeShiftTable.innerHTML = '';
 
                 const employeeShifts = employeeShiftsData.filter(es => es.EmployeeID === employeeId);
 
                 const shiftsInfo = employeeShifts.map(employeeShift => {
-                    const shift = shiftData.find(s => s._id === employeeShift.ShiftID);
+                    const shift = shiftsData.find(s => s._id === employeeShift.ShiftID);
                     
                     if (shift) {
                         const date = new Date(shift.Date).toLocaleDateString('en-US');
@@ -130,27 +91,18 @@
             //--------------------------------------------------
 
             //------add options to departments drop down------
-            const shiftsDropdownData = async (employeeId) => {
-                 const shiftsData = await getShifts();
-                 const employeeShiftsData = await getEmployeeShift();
-    
-                // Get all shifts assigned to this employee
-                const employeeShifts = employeeShiftsData
-                    .filter(es => es.EmployeeID === employeeId)
-                    .map(es => es.ShiftID); 
-
+            const shiftsDropdownData = (employeeId) => {
+                const employeeShifts = employeeShiftsData.filter(es => es.EmployeeID === employeeId).map(es => es.ShiftID);
                 const shiftsDropdown = document.getElementById('shiftsDropdown');
-                shiftsDropdown.innerHTML = '<option value="">All Shifts</option>'; // Default option
+                shiftsDropdown.innerHTML = '<option value="">All Shifts</option>'; 
 
                 shiftsData.forEach(shift => {
-                    if (!employeeShifts.includes(shift._id)) { 
+                    if (!employeeShifts.includes(shift._id)) {
                         const date = new Date(shift.Date).toLocaleDateString('en-US');
-                        const currShift = `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
-                        shiftsDropdown.innerHTML += `<option value="${shift._id}">${currShift}</option>`;
+                        shiftsDropdown.innerHTML += `<option value="${shift._id}">${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00</option>`;
                     }
                 });
             };
-
             //--------------------------------------------------
 
             const RegisterEmployeeToShift = async () => {
@@ -178,12 +130,13 @@
 
                 if (resp.ok) {
                     alert('employee shift successfully added');
-                    EmployeeTableInfo();
+                    EmployeeTableInfo(employeeId);
                 } else {
                     alert('Failed to add employee shift. Please try again.');
                 }
 
             }
+
 
 
             const pageDisplay = async () => {
@@ -196,9 +149,9 @@
                 } else {
                     document.getElementById('fullName').innerText = fullName;
                     const employeeId = new URLSearchParams(location.search).get('id');
-
+                    await loadData(employeeId);
                     await formInitialize(employeeId);
-                    await EmployeeTableInfo();
+                    await EmployeeTableInfo(employeeId);
                     await shiftsDropdownData(employeeId);
                 }       
             };
@@ -246,15 +199,8 @@
             //-----------------------------------------------------
 
             //------ Check if employee is a manager ------
-            const isEmployeeManager = async (employeeId) => {
-                const token = sessionStorage.getItem('token');
-                const departmentsData = await fetch(departmentsURL, {
-                    headers: { 'x-access-token': token },
-                });
-                const departments = await departmentsData.json();
-
-                // Check if the employee is assigned as a manager in any department
-                return departments.some(department => department.Manager === employeeId);
+            const isEmployeeManager = (employeeId) => {
+                return departmentsData.some(d => d.Manager === employeeId);
             };
             //-----------------------------------------------------
 
@@ -271,7 +217,7 @@
                 }
 
                 // Send DELETE request, employeeShift collection
-                const employeeShiftsData = await getEmployeeShift();
+                const employeeShiftsData = await fetchData(employeeShiftURL);
                 const employeeShift = employeeShiftsData.filter(es => es.EmployeeID == employeeId);
                 for(const shift of employeeShift){
                     const resp = await fetch(`${employeeShiftURL}/${shift._id}`, {
@@ -333,14 +279,9 @@
 
         <!-- Table of all employee shift -->
         <table border="1">
-            <thead>
-            <tr>
-                <th>Shifts</th>
-            </tr>
-            </thead>
-            <tbody id="employeeShiftTable">
-            </tbody>
-        </table> <br><br>
+            <thead><tr><th>Shifts</th></tr></thead>
+            <tbody id="employeeShiftTable"></tbody>
+        </table> <br> <br>
         <!--------------------------->
 
         <!--drop down with an additional shifts. -->

@@ -5,23 +5,26 @@
             const employeesURL = 'http://localhost:3000/employees';
             const departmentsURL = 'http://localhost:3000/departments';
 
-            
-            //------return all the departments data------
-            const getDepartments = async () => {
-            const token = sessionStorage.getItem('token');
+            //-------------- handle  fetch requests --------------
+            const fetchData = async (url) => {
+                const token = sessionStorage.getItem('token');
 
-            const resp = await fetch(departmentsURL, {
-                headers: { 'x-access-token': token },
-            });
-
-            return await resp.json();
+                try {
+                    const resp = await fetch(`${url}`, {
+                        headers: { 'x-access-token': token },
+                    });
+                    return await resp.json();
+                } catch (error) {
+                    console.log(`Fetch error for ${url}`);
+                    alert('An error occurred while fetching data. Please try again.');
+                }
             };
-            //---------------------------------------------
+             //------------------------------------------------------
 
             //------add options to departments drop down------
             const DepartmentDropdownData = async () => {
                 
-                const departmentsData = await getDepartments();
+                const departmentsData = await fetchData(departmentsURL);
                 const departmentDropdown = document.getElementById('departmentDropdown');
                 departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
 
