@@ -3,7 +3,6 @@
     <head>
         <script>
             const employeesURL = 'http://localhost:3000/employees';
-            const departmentsURL = 'http://localhost:3000/departments';
 
             //-------------- handle  fetch requests --------------
             const fetchData = async (url) => {
@@ -21,21 +20,28 @@
             };
              //------------------------------------------------------
 
-            //------add options to departments drop down------
+ 
+            //--------- add options to departments drop down -------
             const DepartmentDropdownData = async () => {
-                
-                const departmentsData = await fetchData(departmentsURL);
+
+                const employeesDetails = await fetchData(`${employeesURL}?details=true`);
+
                 const departmentDropdown = document.getElementById('departmentDropdown');
                 departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
 
-                departmentsData.forEach(department => {
-                    const option = document.createElement('option');
-                    departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
+                const departmentSet = new Set();
+                employeesDetails.forEach(employee => {
+                    
+                    if (!departmentSet.has(employee.departmentName)){
+                        const option = document.createElement('option');
+                        departmentDropdown.innerHTML += `<option value="${employee.departmentId}">${employee.departmentName}</option>`;
+                        departmentSet.add(employee.departmentName)
+                    }
                 });
             };
-            //--------------------------------------------------
+            //------------------------------------------------------
             
-            //------ add new employee  ------
+            //------------------ add new employee  ------------------
             const addEmployee = async () => {
                 const token = sessionStorage.getItem('token');
 
@@ -67,11 +73,11 @@
             };
             //-----------------------------------------------------
             
-            //------back to employees page ------
+            //-------------- back to employees page --------------
             const cancel = () => {
                 location.href = 'employeePage.html'; 
             };
-            //-----------------------------------
+            //----------------------------------------------------
 
             const pageDisplay = async () => {
                 const token = sessionStorage.getItem('token');
@@ -86,12 +92,14 @@
                 }       
             };
 
-            //------user log out------ 
+            //-------------------- user log out -------------------- 
             function logout() {
-                sessionStorage.clear();
-                location.href = 'loginPage.html'; 
+                if (confirm("Are you sure you want to log out?")) {
+                    sessionStorage.clear(); 
+                    location.href = 'loginPage.html'; 
+                }
             };
-            //-------------------------
+            //-----------------------------------------------------
 
         </script>
     </head>
