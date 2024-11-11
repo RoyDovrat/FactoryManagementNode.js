@@ -15,7 +15,7 @@ router.get('/', verifyToken, async (req, res) => {
 
     if (details === 'true') {
         
-        employees = await employeeService.getEmplyeesWithDetails(); // URL: http://localhost:3000/employees?details=true
+        employees = await employeeService.getEmployeesWithDetails(); // URL: http://localhost:3000/employees?details=true
     } else {
         
         employees = await employeeService.getAllEmployees(); // URL: http://localhost:3000/employees

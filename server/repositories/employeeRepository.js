@@ -4,7 +4,7 @@ const getAllEmployees = (filters) => {
   return Employee.find(filters);
 };
 
-const getEmployeeById = (id) => {
+const getEmployeeById =  async (id) => {
   return Employee.findById(id);
 };
 

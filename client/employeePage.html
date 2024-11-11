@@ -53,9 +53,14 @@
                 const departmentDropdown = document.getElementById('departmentDropdown');
                 departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
 
+                const departmentSet = new Set();
                 employeesDetails.forEach(employee => {
-                    const option = document.createElement('option');
-                    departmentDropdown.innerHTML += `<option value="${employee.departmentId}">${employee.departmentName}</option>`;
+                    
+                    if (!departmentSet.has(employee.departmentName)){
+                        const option = document.createElement('option');
+                        departmentDropdown.innerHTML += `<option value="${employee.departmentId}">${employee.departmentName}</option>`;
+                        departmentSet.add(employee.departmentName)
+                    }
                 });
             };
             //------------------------------------------------------
