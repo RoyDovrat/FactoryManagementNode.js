@@ -4,13 +4,6 @@
     <head>
         <script>
             const employeesURL = 'http://localhost:3000/employees';
-            const departmentsURL = 'http://localhost:3000/departments';
-            const employeeShiftURL = 'http://localhost:3000/employeeShifts';
-            const shiftURL = 'http://localhost:3000/shifts';
-
-            let departmentsData = [];
-            let employeeShiftsData = [];
-            let shiftData = [];
 
             //-------------- handle  fetch requests --------------
             const fetchData = async (url) => {
@@ -26,45 +19,24 @@
                     alert('An error occurred while fetching data. Please try again.');
                 }
             };
-            
-
-            const loadData = async () => {
-                departmentsData = await fetchData(departmentsURL);
-                employeeShiftsData = await fetchData(employeeShiftURL);
-                shiftData = await fetchData(shiftURL);
-            }
             //------------------------------------------------------
 
 
             //----------- display all employees in a table ---------
             const EmployeeTableInfo = async (departmentId = '') => {
-                const employeesData = await fetchData(departmentId ? `${employeesURL}?departmentId=${departmentId}` : employeesURL);
+                //const employeesDetails = await fetchData(`${employeesURL}?details=true`);
+                const employeesDetails = await fetchData(departmentId ? `${employeesURL}?details=true&departmentId=${departmentId}` : `${employeesURL}?details=true`);
         
                 const employeeTable = document.getElementById('employeeTable');
                 employeeTable.innerHTML = '';
 
-                employeesData.forEach(employee => {
-                    const department = departmentsData.find(dep => dep._id === employee.DepartmentID);
-                    const departmentName = department ? department.Name : 'Unknown';
-
-                    const employeeShifts = employeeShiftsData.filter(es => es.EmployeeID === employee._id);
-
-                    const shiftsInfo = employeeShifts.map(employeeShift => {
-                        const shift = shiftData.find(s => s._id === employeeShift.ShiftID);
-                        
-                        if (shift) {
-                            const date = new Date(shift.Date).toLocaleDateString('en-US');
-                            return `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
-                        }
-                        return 'No shift info';
-                    }).join('<br>');
-                        
+                employeesDetails.forEach(employee => {
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td><a href="editEmployee.html?id=${employee._id}">${employee.fullName}</a></td>
-                        <td><a href="editDepartment.html?id=${employee.DepartmentID}">${departmentName}</a></td>
-                        <td>${shiftsInfo}</td>
+                        <td><a href="editDepartment.html?id=${employee.departmentId}">${employee.departmentName}</a></td>
+                        <td>${employee.shifts}</td>
                     `;
                     
                     employeeTable.appendChild(row);
@@ -75,21 +47,23 @@
 
             //--------- add options to departments drop down -------
             const DepartmentDropdownData = async () => {
+
+                const employeesDetails = await fetchData(`${employeesURL}?details=true`);
                 
                 const departmentDropdown = document.getElementById('departmentDropdown');
                 departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
 
-                departmentsData.forEach(department => {
+                employeesDetails.forEach(employee => {
                     const option = document.createElement('option');
-                    departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
+                    departmentDropdown.innerHTML += `<option value="${employee.departmentId}">${employee.departmentName}</option>`;
                 });
             };
             //------------------------------------------------------
 
              //------------ handle department filtering ------------
             const filterEmployeesByDepartment = () => {
-            const selectedDepartmentId = document.getElementById('departmentDropdown').value;
-            EmployeeTableInfo(selectedDepartmentId);
+                const selectedDepartmentId = document.getElementById('departmentDropdown').value;
+                EmployeeTableInfo(selectedDepartmentId);
             };
             //------------------------------------------------------
 
@@ -104,7 +78,6 @@
                 location.href = 'loginPage.html'; 
             } else {
                 document.getElementById('fullName').innerText = fullName;
-                await loadData();
                 await EmployeeTableInfo();
                 await DepartmentDropdownData();
             }       
@@ -162,5 +135,4 @@
             <!---------------------->
 
         </body>
-
 </html>

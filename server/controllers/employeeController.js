@@ -8,14 +8,22 @@ const router = express.Router();
 
 router.get('/', verifyToken, async (req, res) => {
 
-    try {
-      const departmentId = req.query.departmentId;
-      const filters = departmentId ? { DepartmentID: departmentId } : {};
-      const employees = await employeeService.getAllEmployees(filters);
-      res.json(employees); 
-    } catch (error) {
-      res.json(error);
+  try {
+
+    const { details } = req.query;
+    let employees;
+
+    if (details === 'true') {
+        
+        employees = await employeeService.getEmplyeesWithDetails(); // URL: http://localhost:3000/employees?details=true
+    } else {
+        
+        employees = await employeeService.getAllEmployees(); // URL: http://localhost:3000/employees
     }
+    res.json(employees);
+  } catch (error) {
+    res.json(error);
+  }
 
 });
 
