@@ -74,7 +74,7 @@ const deleteEmployee = (id) => {
 };
 
 
-const getEmployeesWithDetails = async () => {
+const getEmployeesWithDetails = async (departmentId) => {
   try {
     
     const employees = await getAllEmployees();
@@ -82,33 +82,36 @@ const getEmployeesWithDetails = async () => {
     const shifts = await shiftRepository.getAllShift();
     const employeesShifts = await employeeShiftRepository.getAllEmployeeShift();
 
-    const employeesDetails = employees.map(employee => {
-    const employeeFullName = `${employee.FirstName} ${employee.LastName}`;
+    const employeesDetails = employees
+      .filter(employee => !departmentId || employee.DepartmentID.toString() === departmentId) // Filter by departmentId if provided
+      .map(employee => {
+        const employeeFullName = `${employee.FirstName} ${employee.LastName}`;
 
-    // Find department name for the employee
-    const department = departments.find(dep => dep._id.toString() === employee.DepartmentID.toString());
-    const departmentName = department ? department.Name : 'Unknown';
+        // Find department name for the employee
+        const department = departments.find(dep => dep._id.toString() === employee.DepartmentID.toString());
+        const departmentName = department ? department.Name : 'Unknown';
 
-    // Find employee shifts
-    const employeeShiftsId = employeesShifts.filter(es => es.EmployeeID.toString() === employee._id.toString());
-    const employeeShiftsDate = employeeShiftsId.map(employeeShift => {
-      const shift = shifts.find(s => s._id.toString() === employeeShift.ShiftID.toString());
-      if (shift) {
-        const date = new Date(shift.Date).toLocaleDateString('en-US');
-        return `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
-      }
-      return 'No shift info';
-    }).join('<br>');
+        // Find employee shifts
+        const employeeShiftsId = employeesShifts.filter(es => es.EmployeeID.toString() === employee._id.toString());
+        const employeeShiftsDate = employeeShiftsId.map(employeeShift => {
+          const shift = shifts.find(s => s._id.toString() === employeeShift.ShiftID.toString());
+          if (shift) {
+            const date = new Date(shift.Date).toLocaleDateString('en-US');
+            return `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
+          }
+          return 'No shift info';
+        }).join('<br>');
 
-      return {
-        _id: employee._id,
-        fullName: employeeFullName,
-        departmentName: departmentName,
-        departmentId: department ? department._id : null,
-        shifts: employeeShiftsDate
-      };
-    });
+        return {
+          _id: employee._id,
+          fullName: employeeFullName,
+          departmentName: departmentName,
+          departmentId: department ? department._id : null,
+          shifts: employeeShiftsDate
+        };
+      });
 
+    return employeesDetails;
     //console.log('Processed Employee Details:', employeesDetails);
     return employeesDetails;
 

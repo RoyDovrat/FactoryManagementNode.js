@@ -18,14 +18,11 @@ router.get('/', verifyToken, async (req, res) => {
           shiftsAndEmployees = await shiftService.getAllShift();
       }
 
-      console.log('Response data:', shiftsAndEmployees); // Log here for debugging
       res.json(shiftsAndEmployees);
   } catch (error) {
       res.json(error);
   }
 });
-
-
 
 
 router.get('/:id', verifyToken, async (req, res) => {

@@ -26,7 +26,7 @@
             const EmployeeTableInfo = async (departmentId = '') => {
                 //const employeesDetails = await fetchData(`${employeesURL}?details=true`);
                 const employeesDetails = await fetchData(departmentId ? `${employeesURL}?details=true&departmentId=${departmentId}` : `${employeesURL}?details=true`);
-        
+                console.log(employeesDetails)
                 const employeeTable = document.getElementById('employeeTable');
                 employeeTable.innerHTML = '';
 
