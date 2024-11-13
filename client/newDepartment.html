@@ -6,7 +6,7 @@
             const departmentsURL = 'http://localhost:3000/departments';
 
             
-            //------return all the employees data------
+            //---------- return all the employees data ----------
             const getEmployees = async (departmentId = '') => {
                 const token = sessionStorage.getItem('token');
                 const url = departmentId ? `${employeesURL}?departmentId=${departmentId}` : employeesURL;
@@ -17,10 +17,10 @@
 
                 return await resp.json()
             };
-            //------------------------------------------
+            //------------------------------------------------------
 
             
-            //------ add new Department ------
+            //----------------- add new Department -----------------
             const addDepartment = async () => {
                 const token = sessionStorage.getItem('token');
 
@@ -55,11 +55,11 @@
             };
             //-----------------------------------------------------
             
-            //------back to employees page ------
+            //-------------- back to employees page --------------
             const cancel = () => {
                 location.href = 'departmentPage.html'; 
             };
-            //-----------------------------------
+            //------------------------------------------------------
 
             const pageDisplay = async () => {
                 const token = sessionStorage.getItem('token');
@@ -73,12 +73,14 @@
                 }       
             };
 
-            //------user log out------ 
+            //-------------------- user log out -------------------- 
             function logout() {
-                sessionStorage.clear();
-                location.href = 'loginPage.html'; 
+                if (confirm("Are you sure you want to log out?")) {
+                    sessionStorage.clear(); 
+                    location.href = 'loginPage.html'; 
+                }
             };
-            //-------------------------
+            //------------------------------------------------------
 
         </script>
     </head>
