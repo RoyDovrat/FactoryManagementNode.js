@@ -170,7 +170,7 @@
 
             //----------- Check if employee is a manager -----------
             const isEmployeeManager = (employeeId) => {
-                return departmentsData.some(d => d.Manager === employeeId);
+                return employeeDetails.allDerpartments.some(department => department.Manager === employeeId);
             };
             //------------------------------------------------------
 
@@ -187,8 +187,11 @@
                 }
 
                 // Send DELETE request, employeeShift collection
-                const employeeShiftsData = await fetchData(employeeShiftURL);
-                const employeeShift = employeeShiftsData.filter(es => es.EmployeeID == employeeId);
+                //const employeeShiftsData = await fetchData(employeeShiftURL);
+                //const employeeShift = employeeShiftsData.filter(es => es.EmployeeID == employeeId);
+                /*
+                const employeeShift = employeeDetails.allEmployeesShifts.filter(es => es.EmployeeID == employeeId);
+                
                 for(const shift of employeeShift){
                     const resp = await fetch(`${employeeShiftURL}/${shift._id}`, {
                     method: 'DELETE',
@@ -200,7 +203,25 @@
                         console.log('Failed to delete employee shift ${shift._id}. Please try again.');
                     }
                 }
+                    */
+                const employeeShift = employeeDetails.allEmployeesShifts.filter(es => es.EmployeeID == employeeId).map(shift => shift._id); // array of shift IDs
 
+                if (employeeShift.length > 0) {
+                const resp = await fetch(employeeShiftURL, {
+                    method: 'DELETE',
+                    headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                    },
+                    body: JSON.stringify({ shiftIds: employeeShift }) 
+                });
+
+                if (resp.ok) {
+                    console.log('Employee shifts deleted successfully.');
+                } else {
+                    console.log('Failed to delete employee shifts. Please try again.');
+                }
+            }
 
             };
             //---------------------------------------------------

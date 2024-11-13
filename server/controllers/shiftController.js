@@ -8,16 +8,24 @@ const router = express.Router();
 // Entry point: http://localhost:3000/shifts
 
 router.get('/', verifyToken, async (req, res) => {
-  
-    try {
-      const filters = req.query;
-      const shifts = await shiftService.getAllShift(filters);
-      res.json(shifts);
-    } catch (error) {
+  try {
+      const { withEmployees } = req.query;
+      let shiftsAndEmployees;
+
+      if (withEmployees === 'true') {
+          shiftsAndEmployees = await shiftService.getAllShiftsAndEmployees();
+      } else {
+          shiftsAndEmployees = await shiftService.getAllShift();
+      }
+
+      console.log('Response data:', shiftsAndEmployees); // Log here for debugging
+      res.json(shiftsAndEmployees);
+  } catch (error) {
       res.json(error);
-    }
-  
+  }
 });
+
+
 
 
 router.get('/:id', verifyToken, async (req, res) => {

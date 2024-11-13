@@ -54,7 +54,8 @@ const getEmployeeById = async (id) => {
     employeeShiftsId,
     employeeShiftsDate,
     allDerpartments: departments,
-    allShifts: shifts
+    allShifts: shifts,
+    allEmployeesShifts: employeesShifts
 
   }
 

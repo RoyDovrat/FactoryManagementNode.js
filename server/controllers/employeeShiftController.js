@@ -57,6 +57,7 @@ router.patch('/:id', verifyToken, async (req, res) => {
 
 });
 
+/*
 router.delete('/:id', verifyToken, async (req, res) => {
 
     try {
@@ -68,5 +69,19 @@ router.delete('/:id', verifyToken, async (req, res) => {
     }
  
 });
+*/
+
+router.delete('/', verifyToken, async (req, res) => {
+
+  try {
+    const {shiftIds} = req.body;
+    const result = await EmployeeShiftService.deleteMultipleEmployeeShifts(shiftIds);
+    res.json(result);
+  } catch (error) {
+    res.json(error);
+  }
+
+});
+
 
 module.exports = router;

@@ -17,9 +17,13 @@ const updateEmployeeShift = (id, obj) => {
   return EmployeeShift.findByIdAndUpdate(id, obj);
 };
 
-
+/*
 const deleteEmployeeShift = (id) => {
   return EmployeeShift.findByIdAndDelete(id);
+};
+*/
+const deleteMultipleEmployeeShifts = (shiftIds) => {
+  return EmployeeShift.deleteMany({ _id: { $in: shiftIds } }); //$in: match any document whose _id is in the shiftIds array
 };
 
 module.exports = {
@@ -27,6 +31,6 @@ module.exports = {
     getEmployeeShiftById,
     addEmployeeShift,
     updateEmployeeShift,
-    deleteEmployeeShift
+    deleteMultipleEmployeeShifts
 
 };
