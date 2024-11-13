@@ -87,7 +87,7 @@
                 };
 
                 // Send POST request
-                const resp = await fetch(shiftURL, {
+                const resp = await fetch(shiftsURL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -97,9 +97,11 @@
                 });
 
                 if (resp.ok) {
-                    alert('New shift successfully added');
+                    await loadData();
                     await shiftsTableInfo();
                     await editShiftsDropdownData();
+                    await shiftsDropdownData();
+                    alert('New shift successfully added');    
                 } else {
                     alert('Failed to add new shift. Please try again.');
                 }
@@ -148,7 +150,7 @@
                 };
 
                 // Send PUT request
-                const resp = await fetch(`${shiftURL}/${shiftId}`, {
+                const resp = await fetch(`${shiftsURL}/${shiftId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -159,8 +161,11 @@
 
                 if (resp.ok) {
                     alert('Shift successfully updated');
+
+                    await loadData();
                     await shiftsTableInfo();
-                    await editShiftsDropdownData(); // Refresh the dropdown
+                    await editShiftsDropdownData();
+                    await shiftsDropdownData();
                 } else {
                     alert('Failed to update shift. Please try again.');
                 }
