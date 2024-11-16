@@ -3,22 +3,27 @@ const departmentRepository = require('../repositories/depatmentRepository');
 const shiftRepository = require('../repositories/shiftRepository');
 const employeeShiftRepository = require('../repositories/employeeShiftRepository')
 
-const getAllEmployees = async (filters) => {
-  return employeeRepository.getAllEmployees(filters);
+const fetchData = async () => {
+  return {
+    departments: await departmentRepository.getAllDepartments(),
+    shifts: await shiftRepository.getAllShift(),
+    employeesShifts: await employeeShiftRepository.getAllEmployeeShift(),
+  };
 };
 
-const getEmployeeById = async (id) => {
-  const employee = await employeeRepository.getEmployeeById(id);
-  const departments = await departmentRepository.getAllDepartments();
-  const shifts = await shiftRepository.getAllShift();
-  const employeesShifts = await employeeShiftRepository.getAllEmployeeShift();
-
-  // Find department name for the employee
-  const department = departments.find(dep => dep._id.toString() === employee.DepartmentID.toString());
+const findDepartmentName = (departments, departmentId) => {
+  const department = departments.find(dep => dep._id.toString() === departmentId.toString());
   const departmentName = department ? department.Name : 'Unknown';
 
-  // Find employee shifts
-  const employeeShiftsId = employeesShifts.filter(es => es.EmployeeID.toString() === employee._id.toString()).map(es => es.ShiftID);;
+  return { departmentId,departmentName}
+};
+
+const findEmployeeShifts = (shifts, employeesShifts, employeeId) => {
+  if (!shifts || !employeesShifts || !employeeId) {
+    return { employeeShiftsId: [], employeeShiftsDate: [] };
+  }
+
+  const employeeShiftsId = employeesShifts.filter(es => es.EmployeeID.toString() === employeeId.toString()).map(es => es.ShiftID);;
   const employeeShiftsDate = employeeShiftsId.map(employeeShift => {
       const shift = shifts.find(s => s._id.toString() === employeeShift.toString());
       if (shift) {
@@ -28,27 +33,26 @@ const getEmployeeById = async (id) => {
       return 'No shift info';
     });
 
-    //console.log('employeeShiftsId', employeeShiftsId)
-    //console.log('employeeShiftsDate', employeeShiftsDate)
-/*
-  const employeeData = {
-    _id: employee._id, FirstName: employee.FirstName, LastName: employee.LastName, StartWorkYear: employee.StartWorkYear,
-    //...employee,
-    employeeDepartmentName: departmentName,
-    employeeDepartmentId: employee.DepartmentID,
-    employeeShiftsId,
-    employeeShiftsDate,
-    allDerpartments: departments,
-    allShifts: shifts
-  }
-  console.log(employeeData)
-  */
- 
-  
+    return {employeeShiftsId, employeeShiftsDate}
+}
+
+const getAllEmployees = async (filters) => {
+  return employeeRepository.getAllEmployees(filters);
+};
+
+const getEmployeeById = async (id) => {
+  const employee = await employeeRepository.getEmployeeById(id);
+
+  const { departments, shifts, employeesShifts } = await fetchData();
+  const {departmentName} = findDepartmentName(departments, employee.DepartmentID);
+  const {employeeShiftsId, employeeShiftsDate} = findEmployeeShifts(shifts, employeesShifts, employee._id);
+
 
   return {
-    _id: employee._id, FirstName: employee.FirstName, LastName: employee.LastName, StartWorkYear: employee.StartWorkYear,
-    //...employee,
+    _id: employee._id, 
+    FirstName: employee.FirstName, 
+    LastName: employee.LastName, 
+    StartWorkYear: employee.StartWorkYear,
     employeeDepartmentName: departmentName,
     employeeDepartmentId: employee.DepartmentID,
     employeeShiftsId,
@@ -75,48 +79,30 @@ const deleteEmployee = (id) => {
 
 
 const getEmployeesWithDetails = async (departmentId) => {
+  
   try {
-    
     const employees = await getAllEmployees();
-    const departments = await departmentRepository.getAllDepartments();
-    const shifts = await shiftRepository.getAllShift();
-    const employeesShifts = await employeeShiftRepository.getAllEmployeeShift();
+    const { departments, shifts, employeesShifts } = await fetchData();
 
     const employeesDetails = employees
       .filter(employee => !departmentId || employee.DepartmentID.toString() === departmentId) // Filter by departmentId if provided
       .map(employee => {
         const employeeFullName = `${employee.FirstName} ${employee.LastName}`;
-
-        // Find department name for the employee
-        const department = departments.find(dep => dep._id.toString() === employee.DepartmentID.toString());
-        const departmentName = department ? department.Name : 'Unknown';
-
-        // Find employee shifts
-        const employeeShiftsId = employeesShifts.filter(es => es.EmployeeID.toString() === employee._id.toString());
-        const employeeShiftsDate = employeeShiftsId.map(employeeShift => {
-          const shift = shifts.find(s => s._id.toString() === employeeShift.ShiftID.toString());
-          if (shift) {
-            const date = new Date(shift.Date).toLocaleDateString('en-US');
-            return `${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00`;
-          }
-          return 'No shift info';
-        }).join('<br>');
+        const {departmentId ,departmentName} = findDepartmentName(departments, employee.DepartmentID);
+        const {employeeShiftsDate} = findEmployeeShifts(shifts, employeesShifts, employee._id);
 
         return {
           _id: employee._id,
           fullName: employeeFullName,
-          departmentName: departmentName,
-          departmentId: department ? department._id : null,
+          departmentName,
+          departmentId,
           shifts: employeeShiftsDate
         };
       });
 
     return employeesDetails;
-    //console.log('Processed Employee Details:', employeesDetails);
-    return employeesDetails;
 
   } catch (error) {
-    //console.error('Error in getEmplyeesWithDetails:', error.message);
     throw error;
   }
 };

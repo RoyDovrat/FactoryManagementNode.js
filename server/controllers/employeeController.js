@@ -1,6 +1,6 @@
 const employeeService = require('../services/employeeService');
 const verifyToken = require('../middlewares/authMiddleware');
-const checkUserActionsLimit = require('../middlewares/actionLimitMiddleware')
+const checkUserActionsLimit = require('../middlewares/actionsLimitMiddleware')
 
 const express = require('express');
 const router = express.Router();
