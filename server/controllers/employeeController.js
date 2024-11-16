@@ -54,7 +54,7 @@ router.get('/withDetails', verifyToken, checkUserActionsLimit, async (req, res) 
 });
 
 
-router.get('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
+router.get('/:id', verifyToken, async (req, res) => {
   
     try {
       const {id} = req.params;

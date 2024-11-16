@@ -1,217 +1,200 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script>
-            const employeesURL = 'http://localhost:3000/employees';
-            const departmentsURL = 'http://localhost:3000/departments';
-            const employeeShiftURL = 'http://localhost:3000/employeeShifts';
 
-            let employeeDetails = [];
+<head>
+    <script>
+        const employeesURL = 'http://localhost:3000/employees';
+        const departmentsURL = 'http://localhost:3000/departments';
+        const employeeShiftURL = 'http://localhost:3000/employeeShifts';
 
-            //---------------- handle  fetch requests ----------------
-            const fetchData = async (url) => {
-                const token = sessionStorage.getItem('token');
+        let employeeDetails = [];
 
-                try {
-                    const resp = await fetch(`${url}`, {
-                        headers: { 'x-access-token': token },
-                    });
-                    return await resp.json();
-                } catch (error) {
-                    console.log(`Fetch error for ${url}`);
-                    alert('An error occurred while fetching data. Please try again.');
-                }
-            };
+        //---------------- handle  fetch requests ----------------
+        const fetchData = async (url) => {
+            const token = sessionStorage.getItem('token');
 
-            const loadData = async (employeeId) => {
-                employeeDetails = await fetchData(`${employeesURL}/${employeeId}`);
-            }
-            //----------------------------------------------------------
-
-            //------add the employee's current information in form------
-            const formInitialize = () => {
-               
-                document.getElementById('employeeFirstName').value = employeeDetails.FirstName;
-                document.getElementById('employeeLastName').value = employeeDetails.LastName;
-                document.getElementById('startWorkYear').value = employeeDetails.StartWorkYear;
-            }
-            //----------------------------------------------------------
-
-            
-            //---------- add options to departments drop down ----------
-            const DepartmentDropdownData = () => {
-                const departmentDropdown = document.getElementById('departmentDropdown');
-                departmentDropdown.innerHTML = ''; 
-                
-                employeeDetails.allDerpartments.forEach(department => {
-                    const option = document.createElement('option');
-                    departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
-                    
-                    if (department._id === employeeDetails.employeeDepartmentId) {
-                        option.selected = true; // Mark as selected if it matches the current department
-                    }
+            try {
+                const resp = await fetch(`${url}`, {
+                    headers: { 'x-access-token': token },
                 });
-            };
-            //----------------------------------------------------------
+                return await resp.json();
+            } catch (error) {
+                console.log(`Fetch error for ${url}`);
+                alert('An error occurred while fetching data. Please try again.');
+            }
+        };
+
+        const loadData = async (employeeId) => {
+            employeeDetails = await fetchData(`${employeesURL}/${employeeId}`);
+        }
+        //----------------------------------------------------------
+
+        //------add the employee's current information in form------
+        const formInitialize = () => {
+
+            document.getElementById('employeeFirstName').value = employeeDetails.FirstName;
+            document.getElementById('employeeLastName').value = employeeDetails.LastName;
+            document.getElementById('startWorkYear').value = employeeDetails.StartWorkYear;
+        }
+        //----------------------------------------------------------
 
 
-             //-------- add information to employee shift table --------
-            const EmployeeShiftsInfo = async () => {  
-                const employeeShiftTable = document.getElementById('employeeShiftTable');
-                employeeShiftTable.innerHTML = '';  // Clear previous rows
+        //---------- add options to departments drop down ----------
+        const DepartmentDropdownData = () => {
+            const departmentDropdown = document.getElementById('departmentDropdown');
+            departmentDropdown.innerHTML = '';
 
-                const employeeShifts = employeeDetails.employeeShiftsDate || [];
+            employeeDetails.allDerpartments.forEach(department => {
+                const option = document.createElement('option');
+                departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
 
-                if (employeeShifts.length > 0) {
-                    employeeShifts.forEach(shift => {
-                        const row = document.createElement('tr');
-                        const shiftCell = document.createElement('td');
-                        shiftCell.innerHTML = shift; // Insert shift info into cell
-                        row.appendChild(shiftCell);
-                        employeeShiftTable.appendChild(row); // Add row to table
-                    });
-                } else {
-                    
+                if (department._id === employeeDetails.employeeDepartmentId) {
+                    option.selected = true; // Mark as selected if it matches the current department
+                }
+            });
+        };
+        //----------------------------------------------------------
+
+
+        //-------- add information to employee shift table --------
+        const EmployeeShiftsInfo = async () => {
+            const employeeShiftTable = document.getElementById('employeeShiftTable');
+            employeeShiftTable.innerHTML = '';  // Clear previous rows
+
+            const employeeShifts = employeeDetails.employeeShiftsDate || [];
+
+            if (employeeShifts.length > 0) {
+                employeeShifts.forEach(shift => {
                     const row = document.createElement('tr');
-                    const noShiftCell = document.createElement('td');
-                    noShiftCell.textContent = 'No shifts available';
-                    row.appendChild(noShiftCell);
-                    employeeShiftTable.appendChild(row);
-                }
-            };
-            //------------------------------------------------------
-
-            //-------- add options to departments drop down --------
-            const shiftsDropdownData = () => {
-                
-                const shiftsDropdown = document.getElementById('shiftsDropdown');
-                shiftsDropdown.innerHTML = '<option value="">All Shifts</option>'; 
-   
-                employeeDetails.allShifts.forEach(shift => {
-                    if (!employeeDetails.employeeShiftsId.includes(shift._id)) {
-                        const date = new Date(shift.Date).toLocaleDateString('en-US');
-                        shiftsDropdown.innerHTML += `<option value="${shift._id}">${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00</option>`;
-                    }
+                    const shiftCell = document.createElement('td');
+                    shiftCell.innerHTML = shift; // Insert shift info into cell
+                    row.appendChild(shiftCell);
+                    employeeShiftTable.appendChild(row); // Add row to table
                 });
-            };
-            //------------------------------------------------------
+            } else {
 
-            //------- register employee to an EXISTING shift -------
-            const RegisterEmployeeToShift = async () => {
-                const employeeId = new URLSearchParams(location.search).get('id');
-              
-                const token = sessionStorage.getItem('token');
-
-                const shiftsDropdown = document.getElementById('shiftsDropdown');
-                const shiftId = shiftsDropdown.value;
-    
-                const updatedEmployeeShift = {
-                    ShiftID: shiftId,
-                    EmployeeID: employeeId
-                };
-
-                // Send POST request
-                const resp = await fetch(employeeShiftURL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-access-token': token,
-                    },
-                    body: JSON.stringify(updatedEmployeeShift)
-                });
-
-                if (resp.ok) {
-                    alert('employee shift successfully added');
-                    EmployeeShiftsInfo(employeeId);
-                } else {
-                    alert('Failed to add employee shift. Please try again.');
-                }
-
+                const row = document.createElement('tr');
+                const noShiftCell = document.createElement('td');
+                noShiftCell.textContent = 'No shifts available';
+                row.appendChild(noShiftCell);
+                employeeShiftTable.appendChild(row);
             }
-            //------------------------------------------------------
+        };
+        //------------------------------------------------------
 
+        //-------- add options to departments drop down --------
+        const shiftsDropdownData = () => {
 
+            const shiftsDropdown = document.getElementById('shiftsDropdown');
+            shiftsDropdown.innerHTML = '<option value="">All Shifts</option>';
 
-            //-------- Update employee data on the server --------
-            const updateEmployee = async () => {
-                const employeeId = new URLSearchParams(location.search).get('id');
-                const token = sessionStorage.getItem('token');
-
-                const departmentDropdown = document.getElementById('departmentDropdown');
-                const departmentId = departmentDropdown.value;
-
-                
-                const updatedEmployee = {
-                    FirstName: document.getElementById('employeeFirstName').value,
-                    LastName: document.getElementById('employeeLastName').value,
-                    StartWorkYear: document.getElementById('startWorkYear').value,
-                    DepartmentID: departmentId 
-                };
-
-                // Send PATCH request
-                const resp = await fetch(`${employeesURL}/${employeeId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-access-token': token,
-                    },
-                    body: JSON.stringify(updatedEmployee)
-                });
-
-                if (resp.ok) {
-                    console.log('Employee updated successfully');
-                } else {
-                    console.log('Failed to update employee. Please try again.');
+            employeeDetails.allShifts.forEach(shift => {
+                if (!employeeDetails.employeeShiftsId.includes(shift._id)) {
+                    const date = new Date(shift.Date).toLocaleDateString('en-US');
+                    shiftsDropdown.innerHTML += `<option value="${shift._id}">${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00</option>`;
                 }
+            });
+        };
+        //------------------------------------------------------
+
+        //------- register employee to an EXISTING shift -------
+        const RegisterEmployeeToShift = async () => {
+            const employeeId = new URLSearchParams(location.search).get('id');
+
+            const token = sessionStorage.getItem('token');
+
+            const shiftsDropdown = document.getElementById('shiftsDropdown');
+            const shiftId = shiftsDropdown.value;
+
+            const updatedEmployeeShift = {
+                ShiftID: shiftId,
+                EmployeeID: employeeId
             };
-            //-------------------------------------------------------
 
-            //----------- Check if employee is a manager -----------
-            const isEmployeeManager = (employeeId) => {
-                return employeeDetails.allDerpartments.some(department => department.Manager === employeeId);
+            // Send POST request
+            const resp = await fetch(employeeShiftURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token,
+                },
+                body: JSON.stringify(updatedEmployeeShift)
+            });
+
+            if (resp.ok) {
+                alert('employee shift successfully added');
+                EmployeeShiftsInfo(employeeId);
+            } else {
+                alert('Failed to add employee shift. Please try again.');
+            }
+
+        }
+        //------------------------------------------------------
+
+
+
+        //-------- Update employee data on the server --------
+        const updateEmployee = async () => {
+            const employeeId = new URLSearchParams(location.search).get('id');
+            const token = sessionStorage.getItem('token');
+
+            const departmentDropdown = document.getElementById('departmentDropdown');
+            const departmentId = departmentDropdown.value;
+
+
+            const updatedEmployee = {
+                FirstName: document.getElementById('employeeFirstName').value,
+                LastName: document.getElementById('employeeLastName').value,
+                StartWorkYear: document.getElementById('startWorkYear').value,
+                DepartmentID: departmentId
             };
-            //------------------------------------------------------
 
-            //-------- Delete employee data from the server --------
-            const deleteEmployee = async () => {
-                const employeeId = new URLSearchParams(location.search).get('id');
-                const token = sessionStorage.getItem('token');
+            // Send PATCH request
+            const resp = await fetch(`${employeesURL}/${employeeId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token,
+                },
+                body: JSON.stringify(updatedEmployee)
+            });
 
-                // Check if employee is a manager
-                const isManager = await isEmployeeManager(employeeId);
-                if (isManager) {
-                    alert("This employee is a manager and cannot be deleted.");
-                    return;
-                }
+            if (resp.ok) {
+                console.log('Employee updated successfully');
+            } else {
+                console.log('Failed to update employee. Please try again.');
+            }
+        };
+        //-------------------------------------------------------
 
-                // Send DELETE request, employeeShift collection
-                //const employeeShiftsData = await fetchData(employeeShiftURL);
-                //const employeeShift = employeeShiftsData.filter(es => es.EmployeeID == employeeId);
-                /*
-                const employeeShift = employeeDetails.allEmployeesShifts.filter(es => es.EmployeeID == employeeId);
-                
-                for(const shift of employeeShift){
-                    const resp = await fetch(`${employeeShiftURL}/${shift._id}`, {
-                    method: 'DELETE',
-                    headers: {'x-access-token': token}
-                });
-                    if (resp.ok) {
-                        console.log('Employee shifts deleted successfully.');
-                    } else {
-                        console.log('Failed to delete employee shift ${shift._id}. Please try again.');
-                    }
-                }
-                    */
-                const employeeShift = employeeDetails.allEmployeesShifts.filter(es => es.EmployeeID == employeeId).map(shift => shift._id); // array of shift IDs
+        //----------- Check if employee is a manager -----------
+        const isEmployeeManager = (employeeId) => {
+            return employeeDetails.allDerpartments.some(department => department.Manager === employeeId);
+        };
+        //------------------------------------------------------
 
-                if (employeeShift.length > 0) {
+        //-------- Delete employee data from the server --------
+        const deleteEmployee = async () => {
+            const employeeId = new URLSearchParams(location.search).get('id');
+            const token = sessionStorage.getItem('token');
+
+            // Check if employee is a manager
+            const isManager = await isEmployeeManager(employeeId);
+            if (isManager) {
+                alert("This employee is a manager and cannot be deleted.");
+                return;
+            }
+
+            const employeeShift = employeeDetails.allEmployeesShifts.filter(es => es.EmployeeID == employeeId).map(shift => shift._id); // array of shift IDs
+
+            if (employeeShift.length > 0) {
                 const resp = await fetch(employeeShiftURL, {
                     method: 'DELETE',
                     headers: {
-                    'Content-Type': 'application/json',
-                    'x-access-token': token
+                        'Content-Type': 'application/json',
+                        'x-access-token': token
                     },
-                    body: JSON.stringify({ shiftIds: employeeShift }) 
+                    body: JSON.stringify({ shiftIds: employeeShift })
                 });
 
                 if (resp.ok) {
@@ -221,91 +204,112 @@
                 }
             }
 
-            };
-            //---------------------------------------------------
+            const resp = await fetch(`${employeesURL}/${employeeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token,
+                },
+                body: JSON.stringify({ employeeId })
+            });
 
-            
-            const pageDisplay = async () => {
-                const token = sessionStorage.getItem('token');
-                const fullName = sessionStorage.getItem('fullName');
+            if (resp.ok) {
+                console.log('Employee deleted successfully');
+            } else {
+                console.log('Failed to delete employee. Please try again.');
+            }
 
-                if (!token) {
-                    alert("Please log in first.");
-                    location.href = 'loginPage.html'; 
-                } else {
-                    document.getElementById('fullName').innerText = fullName;
-                    const employeeId = new URLSearchParams(location.search).get('id');
-                     
-                    await loadData(employeeId);
-                    await formInitialize();
-                    await DepartmentDropdownData();
-                    await EmployeeShiftsInfo();
-                    await shiftsDropdownData();
-                }       
-            };
+        };
+        //---------------------------------------------------
 
-            
+        const loadPageData = async (departmentId = '') => {
+            const employeeId = new URLSearchParams(location.search).get('id');
+
+            await loadData(employeeId);
+            await formInitialize();
+            await DepartmentDropdownData();
+            await EmployeeShiftsInfo();
+            await shiftsDropdownData();
+        };
+
+        const pageDisplay = async () => {
+            const token = sessionStorage.getItem('token');
+            const fullName = sessionStorage.getItem('fullName');
+
+            if (!token) {
+                alert("Please log in first.");
+                location.href = 'loginPage.html';
+            } else {
+                document.getElementById('fullName').innerText = fullName;
+                const employeeId = new URLSearchParams(location.search).get('id');
+
+                await loadPageData();
+            }
+        };
+
+
         //-------------------- user log out -------------------- 
         function logout() {
             if (confirm("Are you sure you want to log out?")) {
-                sessionStorage.clear(); 
-                location.href = 'loginPage.html'; 
+                sessionStorage.clear();
+                location.href = 'loginPage.html';
             }
         };
         //------------------------------------------------------
 
-             
-        </script>
-    </head>
 
-    <body onload="pageDisplay()">
-        <h1>Edit Employees Page</h1>
+    </script>
+</head>
 
-        <!-- Display user's full name -->
-        <p>Welcome, <span id="fullName"></span></p>
-        <!------------------------------>
+<body onload="pageDisplay()">
+    <h1>Edit Employees Page</h1>
 
-        <!--log out option-->
-        <a href="" onclick="logout()">Log Out</a><br><br>
-        <!------------------>
+    <!-- Display user's full name -->
+    <p>Welcome, <span id="fullName"></span></p>
+    <!------------------------------>
 
-        <!--form to edit the selected employee-->
-        <form id="employeeForm">
-            First Name: <input type="text" id="employeeFirstName" required>
-            <br><br>
-            Last Name: <input type="text" id="employeeLastName" required>
-            <br><br>
-            Start Work Year: <input type="number" id="startWorkYear" required>
-            <br><br>
-            Department: <select id="departmentDropdown">
-            </select> <br><br>
-        </form>
+    <!--log out option-->
+    <a href="" onclick="logout()">Log Out</a><br><br>
+    <!------------------>
 
-        <button type="button" onclick="updateEmployee()">Update</button>
-        <button type="button" onclick="deleteEmployee()">Delete</button> <br><br>
+    <!--form to edit the selected employee-->
+    <form id="employeeForm">
+        First Name: <input type="text" id="employeeFirstName" required>
+        <br><br>
+        Last Name: <input type="text" id="employeeLastName" required>
+        <br><br>
+        Start Work Year: <input type="number" id="startWorkYear" required>
+        <br><br>
+        Department: <select id="departmentDropdown">
+        </select> <br><br>
+    </form>
 
-        <!-- Table of all employee shift -->
-         
-        <table border="1">
-            <thead>
+    <button type="button" onclick="updateEmployee()">Update</button>
+    <button type="button" onclick="deleteEmployee()">Delete</button> <br><br>
+
+    <!-- Table of all employee shift -->
+
+    <table border="1">
+        <thead>
             <tr>
                 <th>Shifts Date and Time</th>
             </tr>
-            </thead>
-            <tbody id="employeeShiftTable">
-            </tbody>
-        </table> <br><br>
-        
-        <!--------------------------->
+        </thead>
+        <tbody id="employeeShiftTable">
+        </tbody>
+    </table> <br><br>
 
-        <!--drop down with an additional shifts. -->
-        Additional existing shifts:<select id="shiftsDropdown">
-            <option value="">All Shifts</option> 
-        </select> 
-        <!--------------------------->
-        <button type="button" onclick="RegisterEmployeeToShift()">Register To Shift</button>
+    <!--------------------------->
+
+    <!--drop down with an additional shifts. -->
+    Additional existing shifts:<select id="shiftsDropdown">
+        <option value="">All Shifts</option>
+    </select>
+    <!--------------------------->
+    <button type="button" onclick="RegisterEmployeeToShift()">Register To Shift</button>
 
 
-        
-    </body>
+
+</body>
+
 </html>

@@ -1,5 +1,6 @@
 const EmployeeShiftService = require('../services/employeeShiftService');
 const verifyToken = require('../middlewares/authMiddleware');
+const checkUserActionsLimit = require('../middlewares/actionsLimitMiddleware')
 
 const express = require('express');
 const router = express.Router();
@@ -7,7 +8,7 @@ const router = express.Router();
 
 // Entry point: http://localhost:3000/employeeShifts
 
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', verifyToken,checkUserActionsLimit, async (req, res) => {
 
     try {
       const filters = req.query;
@@ -20,7 +21,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 
-router.get('/:id', verifyToken, async (req, res) => {
+router.get('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
     
     try {
       const {id} = req.params;
@@ -32,7 +33,7 @@ router.get('/:id', verifyToken, async (req, res) => {
     
 });
 
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, checkUserActionsLimit, async (req, res) => {
 
   try {
     const obj = req.body;
@@ -44,7 +45,7 @@ router.post('/', verifyToken, async (req, res) => {
 
 });
 
-router.patch('/:id', verifyToken, async (req, res) => {
+router.patch('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
 
   try {
     const {id} = req.params;
@@ -57,19 +58,6 @@ router.patch('/:id', verifyToken, async (req, res) => {
 
 });
 
-/*
-router.delete('/:id', verifyToken, async (req, res) => {
-
-    try {
-      const {id} = req.params;
-      const result = await EmployeeShiftService.deleteEmployeeShift(id);
-      res.json(result);
-    } catch (error) {
-      res.json(error);
-    }
- 
-});
-*/
 
 router.delete('/', verifyToken, async (req, res) => {
 

@@ -1,7 +1,6 @@
 const usersDBservice = require('../services/userDBservice');
 
 const checkUserActionsLimit = async (req, res, next)  => {
-  console.log('in actionLimitMidlleware')
    
     const userId = req.user.id;
     const user = await usersDBservice.getUserById(userId);

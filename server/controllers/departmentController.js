@@ -1,5 +1,6 @@
 const departmentsService = require('../services/departmentService');
 const verifyToken = require('../middlewares/authMiddleware');
+const checkUserActionsLimit = require('../middlewares/actionsLimitMiddleware')
 
 const express = require('express');
 const router = express.Router();
@@ -28,7 +29,7 @@ router.get('/', verifyToken, async (req, res) => {
 
 });
 
-router.get('/:id', verifyToken, async (req, res)=> {
+router.get('/:id', verifyToken, checkUserActionsLimit, async (req, res)=> {
   
     try {
       const {id} = req.params;
@@ -42,7 +43,7 @@ router.get('/:id', verifyToken, async (req, res)=> {
 
 
 
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, checkUserActionsLimit, async (req, res) => {
 
     try {
       const obj = req.body;
@@ -54,7 +55,7 @@ router.post('/', verifyToken, async (req, res) => {
  
 });
 
-router.patch('/:id', verifyToken, async (req, res) => {
+router.patch('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
 
   try {
     const {id} = req.params;
@@ -67,7 +68,7 @@ router.patch('/:id', verifyToken, async (req, res) => {
 
 });
 
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
 
   try {
     const {id} = req.params;

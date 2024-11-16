@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'some_key';
 
 const verifyToken = (req, res, next) => {
-  console.log('in authMidlleware')
     const token = req.headers['x-access-token'];
   
     if (!token) {
