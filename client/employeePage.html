@@ -1,143 +1,148 @@
 <!DOCTYPE html>
 <html>
-   
-    <head>
-        <script>
-            const employeesURL = 'http://localhost:3000/employees';
 
-            //-------------- handle  fetch requests --------------
-            const fetchData = async (url) => {
-                const token = sessionStorage.getItem('token');
+<head>
+    <script>
+        const employeesURL = 'http://localhost:3000/employees';
 
-                try {
-                    const resp = await fetch(`${url}`, {
-                        headers: { 'x-access-token': token },
-                    });
-                    return await resp.json();
-                } catch (error) {
-                    console.log(`Fetch error for ${url}`);
-                    alert('An error occurred while fetching data. Please try again.');
-                }
-            };
-            //------------------------------------------------------
+        //-------------- handle  fetch requests --------------
+        const fetchData = async (url) => {
+            const token = sessionStorage.getItem('token');
+
+            try {
+                const resp = await fetch(`${url}`, {
+                    headers: { 'x-access-token': token },
+                });
+                return await resp.json();
+            } catch (error) {
+                console.log(`Fetch error for ${url}`);
+                alert('An error occurred while fetching data. Please try again.');
+            }
+        };
+        //------------------------------------------------------
 
 
-            //----------- display all employees in a table ---------
-            const EmployeeTableInfo = async (departmentId = '') => {
-                //const employeesDetails = await fetchData(`${employeesURL}?details=true`);
-                const employeesDetails = await fetchData(departmentId ? `${employeesURL}?details=true&departmentId=${departmentId}` : `${employeesURL}?details=true`);
-                console.log(employeesDetails)
-                const employeeTable = document.getElementById('employeeTable');
-                employeeTable.innerHTML = '';
+        //----------- display all employees in a table ---------
+        const EmployeeTableInfo = async (employeesDetails) => {
 
-                employeesDetails.forEach(employee => {
+            const employeeTable = document.getElementById('employeeTable');
+            employeeTable.innerHTML = '';
 
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+            employeesDetails.forEach(employee => {
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
                         <td><a href="editEmployee.html?id=${employee._id}">${employee.fullName}</a></td>
                         <td><a href="editDepartment.html?id=${employee.departmentId}">${employee.departmentName}</a></td>
                         <td>${employee.shifts}</td>
                     `;
-                    
-                    employeeTable.appendChild(row);
-                });
-            };
-            //------------------------------------------------------
+
+                employeeTable.appendChild(row);
+            });
+        };
+        //------------------------------------------------------
 
 
-            //--------- add options to departments drop down -------
-            const DepartmentDropdownData = async () => {
+        //--------- add options to departments drop down -------
 
-                const employeesDetails = await fetchData(`${employeesURL}?details=true`);
-                
-                const departmentDropdown = document.getElementById('departmentDropdown');
-                departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
+        const populateDepartmentDropdown = (departments) => {
+            const departmentDropdown = document.getElementById('departmentDropdown');
+            departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
 
-                const departmentSet = new Set();
-                employeesDetails.forEach(employee => {
-                    
-                    if (!departmentSet.has(employee.departmentName)){
-                        const option = document.createElement('option');
-                        departmentDropdown.innerHTML += `<option value="${employee.departmentId}">${employee.departmentName}</option>`;
-                        departmentSet.add(employee.departmentName)
-                    }
-                });
-            };
-            //------------------------------------------------------
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.departmentId;
+                option.textContent = dept.departmentName;
+                departmentDropdown.appendChild(option);
+            });
+        };
+        //------------------------------------------------------
 
-             //------------ handle department filtering ------------
-            const filterEmployeesByDepartment = () => {
-                const selectedDepartmentId = document.getElementById('departmentDropdown').value;
-                EmployeeTableInfo(selectedDepartmentId);
-            };
-            //------------------------------------------------------
+        //------------ handle department filtering ------------
+        const filterEmployeesByDepartment = () => {
+            const selectedDepartmentId = document.getElementById('departmentDropdown').value;
+            //EmployeeTableInfo(selectedDepartmentId);
+            loadPageData(selectedDepartmentId);
+        };
+        //------------------------------------------------------
 
 
-            //------------------ load initial data ------------------
-            const pageDisplay = async () => {
-              const token = sessionStorage.getItem('token');
-              const fullName = sessionStorage.getItem('fullName');
+        //------------------ load initial data ------------------
+        const loadPageData = async (departmentId = '') => {
+            const { employees, uniqueDepartments } = await fetchData(
+                departmentId ? `${employeesURL}/withDetails?departmentId=${departmentId}` : `${employeesURL}/withDetails`
+            );
+
+            EmployeeTableInfo(employees);
+            return uniqueDepartments;
+        };
+
+        const pageDisplay = async () => {
+            const token = sessionStorage.getItem('token');
+            const fullName = sessionStorage.getItem('fullName');
 
             if (!token) {
                 alert("Please log in first.");
-                location.href = 'loginPage.html'; 
+                location.href = 'loginPage.html';
+
             } else {
                 document.getElementById('fullName').innerText = fullName;
-                await EmployeeTableInfo();
-                await DepartmentDropdownData();
-            }       
+                const uniqueDepartments = await loadPageData();
+                await populateDepartmentDropdown(uniqueDepartments);
+            }
         }
         //------------------------------------------------------
 
-        
+
         //-------------------- user log out -------------------- 
         function logout() {
             if (confirm("Are you sure you want to log out?")) {
-                sessionStorage.clear(); 
-                location.href = 'loginPage.html'; 
+                sessionStorage.clear();
+                location.href = 'loginPage.html';
             }
         };
         //------------------------------------------------------
-    
-          </script>
 
-        </head>
+    </script>
 
-        <body onload="pageDisplay()">  <!--when the page open we want to receive the data in sessionStorage-->
-            <h1>Employees Page</h1>
-            
-            <!-- Display user's full name -->
-            <p>Welcome, <span id="fullName"></span></p>
-            <!------------------------------>
+</head>
 
-            <!--log out option-->
-            <a href="" onclick="logout()">Log Out</a><br><br>
-            <!------------------>
+<body onload="pageDisplay()"> <!--when the page open we want to receive the data in sessionStorage-->
+    <h1>Employees Page</h1>
 
-            <!--drop down with all departments. -->
-            Filter employees by Department:<select id="departmentDropdown" onchange="filterEmployeesByDepartment()">
-                <option value="">All Departments</option> 
-            </select> <br><br>
-            <!--------------------------->
+    <!-- Display user's full name -->
+    <p>Welcome, <span id="fullName"></span></p>
+    <!------------------------------>
 
-            <!-- Table of employees -->
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>Full Name</th>
-                    <th>Department</th>
-                    <th>Shifts</th>
-                </tr>
-                </thead>
-                <tbody id="employeeTable">
-                </tbody>
-            </table> <br><br>
-            <!--------------------------->
+    <!--log out option-->
+    <a href="" onclick="logout()">Log Out</a><br><br>
+    <!------------------>
+
+    <!--drop down with all departments. -->
+    Filter employees by Department:<select id="departmentDropdown" onchange="filterEmployeesByDepartment()">
+        <option value="">All Departments</option>
+    </select> <br><br>
+    <!--------------------------->
+
+    <!-- Table of employees -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Department</th>
+                <th>Shifts</th>
+            </tr>
+        </thead>
+        <tbody id="employeeTable">
+        </tbody>
+    </table> <br><br>
+    <!--------------------------->
 
 
-            <!-- add new employee -->
-            <button onclick="location.href='newEmployee.html'">Add Employee</button> 
-            <!---------------------->
+    <!-- add new employee -->
+    <button onclick="location.href='newEmployee.html'">Add Employee</button>
+    <!---------------------->
 
-        </body>
+</body>
+
 </html>

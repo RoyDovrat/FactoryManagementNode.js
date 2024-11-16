@@ -1,13 +1,13 @@
 const employeeService = require('../services/employeeService');
 const verifyToken = require('../middlewares/authMiddleware');
+const checkUserActionsLimit = require('../middlewares/actionLimitMiddleware')
 
 const express = require('express');
 const router = express.Router();
 
 // Entry point: http://localhost:3000/employees
 
-router.get('/', verifyToken, async (req, res) => {
-
+router.get('/', verifyToken, checkUserActionsLimit, async (req, res) => {
   try {
 
     const { details, departmentId} = req.query;
@@ -16,6 +16,7 @@ router.get('/', verifyToken, async (req, res) => {
     if (details === 'true') {
         
         employees = await employeeService.getEmployeesWithDetails(departmentId); // URL: http://localhost:3000/employees?details=true
+        
     } else {
         
         employees = await employeeService.getAllEmployees(); // URL: http://localhost:3000/employees
@@ -27,7 +28,33 @@ router.get('/', verifyToken, async (req, res) => {
 
 });
 
-router.get('/:id', verifyToken, async (req, res) => {
+router.get('/withDetails', verifyToken, checkUserActionsLimit, async (req, res) => {
+  try {
+
+      const { departmentId } = req.query;
+      const employees = await employeeService.getEmployeesWithDetails(departmentId);
+
+      const departmentSet = new Set();
+
+      employees.forEach(emp => {
+          departmentSet.add(JSON.stringify({
+              departmentId: emp.departmentId,
+              departmentName: emp.departmentName
+          }));
+      });
+
+      // Convert the Set back to an array of objects
+      const uniqueDepartments = Array.from(departmentSet).map(dept => JSON.parse(dept))
+
+      res.json({ employees, uniqueDepartments });
+
+  } catch (error) {
+      res.status(500).json(error.message);
+  }
+});
+
+
+router.get('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
   
     try {
       const {id} = req.params;
@@ -40,7 +67,7 @@ router.get('/:id', verifyToken, async (req, res) => {
 });
 
 
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, checkUserActionsLimit, async (req, res) => {
 
     try {
       const obj = req.body;
@@ -52,7 +79,7 @@ router.post('/', verifyToken, async (req, res) => {
 
 });
 
-router.patch('/:id', verifyToken, async (req, res)=> {
+router.patch('/:id', verifyToken, checkUserActionsLimit, async (req, res)=> {
 
     try {
       const {id} = req.params;
@@ -65,7 +92,7 @@ router.patch('/:id', verifyToken, async (req, res)=> {
  
 });
 
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
 
     try {
       const {id} = req.params;

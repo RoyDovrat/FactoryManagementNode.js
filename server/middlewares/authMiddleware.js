@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'some_key';
 
 const verifyToken = (req, res, next) => {
+  console.log('in authMidlleware')
     const token = req.headers['x-access-token'];
   
     if (!token) {
@@ -13,7 +14,7 @@ const verifyToken = (req, res, next) => {
         return res.status(500).json('Failed to authenticate token');
       }
   
-      //req.user = data; // Attach decoded token data to request object
+      req.user = data; // Attach decoded token data to request object
       next(); // Proceed to the next middleware or route handler
     });
   };
