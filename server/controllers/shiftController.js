@@ -10,25 +10,30 @@ const router = express.Router();
 
 router.get('/', verifyToken, checkUserActionsLimit, async (req, res) => {
   try {
-      const { withEmployees } = req.query;
-      let shiftsAndEmployees;
 
-      if (withEmployees === 'true') {
-          shiftsAndEmployees = await shiftService.getAllShiftsAndEmployees();
-      } else {
-          shiftsAndEmployees = await shiftService.getAllShift();
-      }
+    const shifts = await shiftService.getAllShift();
+    res.json(shifts);
 
-      res.json(shiftsAndEmployees);
   } catch (error) {
-      res.json(error);
+    res.json(error);
+  }
+});
+
+router.get('/withEmployees', verifyToken, checkUserActionsLimit, async (req, res) => {
+  try {
+
+    const shiftsAndEmployees = await shiftService.getAllShiftsAndEmployees()
+    res.json(shiftsAndEmployees);
+
+  } catch (error) {
+    res.status(500).json(error.message);
   }
 });
 
 
 router.get('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const shift = await shiftService.getShiftById(id);
     res.json(shift);
   } catch (error) {
@@ -38,40 +43,40 @@ router.get('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
 
 router.post('/', verifyToken, checkUserActionsLimit, async (req, res) => {
 
-    try {
-      const obj = req.body;
-      const result = await shiftService.addShift(obj);
-      res.status(201).json(result);
-    } catch (error) {
-      res.status(500).json(error.message);
-    }
+  try {
+    const obj = req.body;
+    const result = await shiftService.addShift(obj);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json(error.message);
+  }
 
 });
 
 router.patch('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
 
-    try {
-      const {id} = req.params;
-      const obj = req.body;
-      const result = await shiftService.updateShift(id, obj);
-      res.json(result);
-    } catch (error) {
-      res.json(error);
-    }
- 
+  try {
+    const { id } = req.params;
+    const obj = req.body;
+    const result = await shiftService.updateShift(id, obj);
+    res.json(result);
+  } catch (error) {
+    res.json(error);
+  }
+
 
 });
 
 router.delete('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
 
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const result = await shiftService.deleteShift(id);
     res.json(result);
   } catch (error) {
     res.json(error);
   }
-  
+
 });
 
 module.exports = router;

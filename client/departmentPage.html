@@ -23,7 +23,7 @@
 
             //------add information to department table------
             const displayDepartmentsTable  = async () => {
-                const departments = await fetchData(`${departmentsURL}?details=true`);
+                const departments = await fetchData(`${departmentsURL}/withDetails`);
                 const departmentTable = document.getElementById('departmentTable');
                 departmentTable.innerHTML = '';
 
