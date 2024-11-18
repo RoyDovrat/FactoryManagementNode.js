@@ -35,4 +35,25 @@ const getAllUsersDetails = async () => {
   }
 };
 
-module.exports = { getAllUsersDetails };
+// Reset user's action count (at the end of the day)
+const resetDailyActions = async () => {
+  try {
+    const users = await usersDBrepository.getAllUsers();
+
+    
+    for (const user of users) {
+      await usersDBrepository.updateUser(user._id, {
+        RemainingAllowdActions: user.NumOfActions,
+      });
+    }
+
+    console.log('Successfully reset daily actions for all users.');
+  } catch (error) {
+    console.error('Error resetting daily actions:', error.message);
+  }
+};
+
+module.exports = { resetDailyActions, getAllUsersDetails };
+
+
+

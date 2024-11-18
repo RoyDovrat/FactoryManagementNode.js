@@ -26,6 +26,16 @@ app.use('/shifts', shiftsRouter);
 app.use('/employeeShifts', employeeShiftsRouter);
 app.use('/users', usersRouter);
 
+/********************reset user actions************************/
+const cron = require('node-cron');
+const { resetDailyActions } = require('./services/userService');
+
+// Schedule a task to reset user actions at midnight every day
+cron.schedule('0 0 * * *', async () => {
+  console.log('Resetting daily actions...');
+  await resetDailyActions();
+});
+/************************************************************/
 
 app.listen(PORT, () => {
   console.log(`app is listening at http://localhost:${PORT}`);
