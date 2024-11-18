@@ -50,10 +50,9 @@ module.exports = router;
 
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const userService = require('../services/userService'); // Use only userService.js
-
+const userService = require('../services/userService'); 
 const router = express.Router();
-const SECRET_KEY = 'some_key'; // Use the provided hardcoded key
+const SECRET_KEY = 'some_key'; 
 const MAX_ACTIONS = 10;
 
 // Entry Point: http://localhost:3000/auth

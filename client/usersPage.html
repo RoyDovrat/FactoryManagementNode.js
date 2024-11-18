@@ -3,6 +3,45 @@
 
 <head>
     <script>
+        const usersURL = 'http://localhost:3000/users';
+
+        //-------------- handle  fetch requests --------------
+        const fetchData = async (url) => {
+            const token = sessionStorage.getItem('token');
+
+            try {
+                const resp = await fetch(`${url}`, {
+                    headers: { 'x-access-token': token },
+                });
+                return await resp.json();
+            } catch (error) {
+                console.log(`Fetch error for ${url}`);
+                alert('An error occurred while fetching data. Please try again.');
+            }
+        };
+        //------------------------------------------------------
+
+        //------------- display all users in a table -----------
+        const usersTableInfo = async () =>{
+            const users = await fetchData(usersURL);
+           
+            const usersTable = document.getElementById('usersTable');
+            usersTable.innerHTML = '';
+
+            users.forEach(user => {
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td>${user.username}</td>
+                        <td>${user.maxActionsAllowed}</td>
+                        <td>${user.currentActionsAllowed}</td>
+                    `;
+
+                    usersTable.appendChild(row);
+            });
+
+        }
+        //------------------------------------------------------
 
 
         const pageDisplay = async () => {
@@ -15,6 +54,7 @@
 
             } else {
                 document.getElementById('fullName').innerText = fullName;
+                await usersTableInfo();
             }
         }
         //------------------------------------------------------

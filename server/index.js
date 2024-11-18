@@ -6,6 +6,7 @@ const departmentsRouter = require('./controllers/departmentController');
 const employeesRouter = require('./controllers/employeeController');
 const shiftsRouter = require('./controllers/shiftController');
 const employeeShiftsRouter = require('./controllers//employeeShiftController');
+const usersRouter = require('./controllers/userController');
 
 const authController = require('./controllers/authController');
 
@@ -22,7 +23,8 @@ app.use('/auth', authController);
 app.use('/departments', departmentsRouter);
 app.use('/employees', employeesRouter);
 app.use('/shifts', shiftsRouter);
-app.use('/employeeShifts', employeeShiftsRouter)
+app.use('/employeeShifts', employeeShiftsRouter);
+app.use('/users', usersRouter);
 
 
 app.listen(PORT, () => {
