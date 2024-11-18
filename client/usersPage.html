@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script>
+
+
+        const pageDisplay = async () => {
+            const token = sessionStorage.getItem('token');
+            const fullName = sessionStorage.getItem('fullName');
+
+            if (!token) {
+                alert("Please log in first.");
+                location.href = 'loginPage.html';
+
+            } else {
+                document.getElementById('fullName').innerText = fullName;
+            }
+        }
+        //------------------------------------------------------
+
+
+        //-------------------- user log out -------------------- 
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                sessionStorage.clear();
+                location.href = 'loginPage.html';
+            }
+        };
+        //------------------------------------------------------
+
+    </script>
+</head>
+
+<body onload="pageDisplay()">
+    <h1>Employees Page</h1>
+
+    <!-- Display user's full name -->
+    <p>Welcome, <span id="fullName"></span></p>
+    <!------------------------------>
+
+    <!--log out option-->
+    <a href="" onclick="logout()">Log Out</a><br><br>
+    <!------------------>
+
+    <!-- Table of employees -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>maximum actions allowed</th>
+                <th>CURRENT actions allowed today</th>
+            </tr>
+        </thead>
+        <tbody id="usersTable">
+        </tbody>
+    </table> <br><br>
+    <!--------------------------->
+</body>
+
+</html>

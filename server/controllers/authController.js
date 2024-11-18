@@ -1,4 +1,4 @@
-
+/*
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const usersWSservice = require('../services/usersWSservice');
@@ -46,3 +46,39 @@ router.post('/login', async (req, res) => {
 });
 
 module.exports = router; 
+*/
+
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const userService = require('../services/userService'); // Use only userService.js
+
+const router = express.Router();
+const SECRET_KEY = 'some_key'; // Use the provided hardcoded key
+const MAX_ACTIONS = 10;
+
+// Entry Point: http://localhost:3000/auth
+
+router.post('/login', async (req, res) => {
+    const { username, email } = req.body;
+    try {
+
+        const allUsers = await userService.getAllUsersDetails();
+
+        const matchedUser = allUsers.find(user => user.username === username && user.email === email);
+        console.log(matchedUser)
+
+        if (!matchedUser) {
+            return res.status(401).json('Invalid username or email');
+        }
+
+        const token = jwt.sign({ id: matchedUser._id, fullName: matchedUser.name }, SECRET_KEY, { expiresIn: '1h' });
+
+        res.json({ token, fullName: matchedUser.name });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json('Server error. Please try again later.');
+    }
+});
+
+module.exports = router;
