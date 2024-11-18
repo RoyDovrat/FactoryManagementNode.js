@@ -1,17 +1,220 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script>
 
-        </script>
-    </head>
+<head>
+    <script>
 
-    <body>
-        <h1>New Employees Page</h1>
+        const departmentsURL = 'http://localhost:3000/departments';
+        const employeesURL = 'http://localhost:3000/employees';
+        const employeeShiftURL = 'http://localhost:3000/employeeShifts';
 
-        <!-- Display user's full name -->
-        <p>Welcome, <span id="fullName"></span></p>
-        <!------------------------------>
-        
-    </body>
+        let departmentDetails = []
+        let employees = []
+
+        //---------------- handle  fetch requests ----------------
+        const fetchData = async (url) => {
+            const token = sessionStorage.getItem('token');
+
+            try {
+                const resp = await fetch(`${url}`, {
+                    headers: { 'x-access-token': token },
+                });
+                return await resp.json();
+            } catch (error) {
+                console.log(`Fetch error for ${url}`);
+                alert('An error occurred while fetching data. Please try again.');
+            }
+        };
+
+        const loadData = async (departmentId) => {
+            departmentDetails = await fetchData(`${departmentsURL}/${departmentId}`);
+            employees = await fetchData(employeesURL);
+        }
+        //----------------------------------------------------------
+
+        //------add the depatment's current information in form------
+        const formInitialize = () => {
+
+            document.getElementById('departmentName').value = departmentDetails.name;
+            document.getElementById('ManagerFullName').value = departmentDetails.managerName;
+        }
+        //----------------------------------------------------------
+
+        const findMangerId = async (managerName) => {
+
+            const manager = employees.find(employee => `${employee.FirstName} ${employee.LastName}`.trim() === managerName.trim());
+
+            return manager ? manager._id : null;;
+        }
+
+        //-------- Update employee data on the server --------
+        const updateDepartment = async () => {
+            const departmentId = new URLSearchParams(location.search).get('id');
+            const token = sessionStorage.getItem('token');
+
+            const managerName = document.getElementById('ManagerFullName').value
+            const managerId = await findMangerId(managerName);
+            if (!managerId) {
+                alert('Manager not found. Please enter a valid manager name.');
+                return;
+
+            }
+
+            const updatedDepartment = {
+                Name: document.getElementById('departmentName').value,
+                Manager: managerId
+
+            };
+
+            // Send PATCH request
+            const resp = await fetch(`${departmentsURL}/${departmentId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token,
+                },
+                body: JSON.stringify(updatedDepartment)
+            });
+
+            if (resp.ok) {
+                console.log('Department updated successfully');
+            } else {
+                console.log('Failed to update department. Please try again.');
+            }
+        };
+        //-------------------------------------------------------
+
+        //-------- Delete employee data from the server --------
+        const deleteDepartment = async () => {
+            const departmentId = new URLSearchParams(location.search).get('id');
+            const token = sessionStorage.getItem('token');
+
+            const updatedEmployee = {
+                DepartmentID: departmentId
+            };
+
+            const resp = await fetch(`${employeesURL}/${employeeId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token,
+                },
+                body: JSON.stringify(updatedEmployee)
+            });
+
+            if (resp.ok) {
+                console.log('Employee updated successfully');
+            } else {
+                console.log('Failed to update employee. Please try again.');
+            }
+
+        };
+        //---------------------------------------------------
+        //-------------- add options to dropdown --------------
+        const populateDropdown = (dropdownId, data, defaultOptionText, displayTextCallback) => {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.innerHTML = `<option value="">${defaultOptionText}</option>`;
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item._id;
+                option.textContent = displayTextCallback(item);
+                dropdown.appendChild(option);
+            });
+        };
+        const employeesDropdownData = async () => {
+            populateDropdown('employeesDropdown', employees , 'All Employees', employee => `${employee.FirstName} ${employee.LastName}`);
+        };
+        //------------------------------------------------------
+
+        //-------------- update employee data ---------------
+        const updateEmployeeDepartment = async () => {
+            const departmentId = new URLSearchParams(location.search).get('id');
+            const token = sessionStorage.getItem('token');
+            const employeeId = document.getElementById('employeesDropdown').value
+
+            const updatedEmployee = {
+                DepartmentID: departmentId
+            };
+
+            // Send PATCH request
+            const resp = await fetch(`${employeesURL}/${employeeId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token,
+                },
+                body: JSON.stringify(updatedEmployee)
+            });
+
+            if (resp.ok) {
+                console.log('Employee updated successfully');
+            } else {
+                console.log('Failed to update employee. Please try again.');
+            }
+        }
+        //-------------------------------------------------------
+
+        const pageDisplay = async () => {
+            const token = sessionStorage.getItem('token');
+            const fullName = sessionStorage.getItem('fullName');
+
+            if (!token) {
+                alert("Please log in first.");
+                location.href = 'loginPage.html';
+            } else {
+                const departmentId = new URLSearchParams(location.search).get('id');
+                document.getElementById('fullName').innerText = fullName;
+
+                await loadData(departmentId);
+                formInitialize();
+                employeesDropdownData();
+            }
+        };
+        //-------------------- user log out -------------------- 
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                sessionStorage.clear();
+                location.href = 'loginPage.html';
+            }
+        };
+        //------------------------------------------------------
+
+    </script>
+</head>
+
+<body onload="pageDisplay()">
+    <h1>Edit Department Page</h1>
+
+    <!-- Display user's full name -->
+    <p>Welcome, <span id="fullName"></span></p>
+    <!------------------------------>
+
+    <!--log out option-->
+    <a href="" onclick="logout()">Log Out</a><br><br>
+    <!------------------>
+
+    <!--form to edit the selected employee-->
+    <form id="employeeForm">
+        Department Name: <input type="text" id="departmentName" required>
+        <br><br>
+        Manager Full Name: <input type="text" id="ManagerFullName" required>
+        </select> <br><br>
+    </form>
+
+    <button type="button" onclick="updateDepartment()">Update</button>
+    <button type="button" onclick="deleteDepartment()">Delete</button> <br><br>
+    <!---------->
+
+    <!-- Register an employee for the department-->
+    Register an employee for the department: <br><br>
+    Choose Employee:<select id="employeesDropdown">
+        <option value="">All Employees</option>
+    </select> <br>
+
+    <button type="button" onclick="updateEmployeeDepartment()">Save</button> <br><br>
+    <!---------->
+
+</body>
+
 </html>

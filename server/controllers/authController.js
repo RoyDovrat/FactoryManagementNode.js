@@ -64,7 +64,6 @@ router.post('/login', async (req, res) => {
         const allUsers = await userService.getAllUsersDetails();
 
         const matchedUser = allUsers.find(user => user.username === username && user.email === email);
-        console.log(matchedUser)
 
         if (!matchedUser) {
             return res.status(401).json('Invalid username or email');
