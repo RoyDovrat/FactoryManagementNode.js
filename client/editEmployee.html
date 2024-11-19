@@ -44,7 +44,7 @@
             const departmentDropdown = document.getElementById('departmentDropdown');
             departmentDropdown.innerHTML = '';
 
-            employeeDetails.allDerpartments.forEach(department => {
+            employeeDetails.data.allDerpartments.forEach(department => {
                 const option = document.createElement('option');
                 departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
 
@@ -88,7 +88,7 @@
             const shiftsDropdown = document.getElementById('shiftsDropdown');
             shiftsDropdown.innerHTML = '<option value="">All Shifts</option>';
 
-            employeeDetails.allShifts.forEach(shift => {
+            employeeDetails.data.allShifts.forEach(shift => {
                 if (!employeeDetails.employeeShiftsId.includes(shift._id)) {
                     const date = new Date(shift.Date).toLocaleDateString('en-US');
                     shiftsDropdown.innerHTML += `<option value="${shift._id}">${date}, ${shift.StartingHour}:00 - ${shift.EndingHour}:00</option>`;
@@ -169,7 +169,7 @@
 
         //----------- Check if employee is a manager -----------
         const isEmployeeManager = (employeeId) => {
-            return employeeDetails.allDerpartments.some(department => department.Manager === employeeId);
+            return employeeDetails.data.allDerpartments.some(department => department.Manager === employeeId);
         };
         //------------------------------------------------------
 
@@ -185,7 +185,7 @@
                 return;
             }
 
-            const employeeShift = employeeDetails.allEmployeesShifts.filter(es => es.EmployeeID == employeeId).map(shift => shift._id); // array of shift IDs
+            const employeeShift = employeeDetails.data.allEmployeesShifts.filter(es => es.EmployeeID == employeeId).map(shift => shift._id); // array of shift IDs
 
             if (employeeShift.length > 0) {
                 const resp = await fetch(employeeShiftURL, {

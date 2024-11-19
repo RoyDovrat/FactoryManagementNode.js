@@ -15,11 +15,6 @@ const addEmployeeShift = (obj) => {
 const updateEmployeeShift = (id, obj) => {
   return employeeShiftRepository.updateEmployeeShift(id, obj);
 };
-/*
-const deleteEmployeeShift = (id) => {
-  return employeeShiftRepository.deleteEmployeeShift(id);
-};
-*/
 
 const deleteMultipleEmployeeShifts = (shiftIds) => {
   return employeeShiftRepository.deleteMultipleEmployeeShifts(shiftIds);

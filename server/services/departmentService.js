@@ -1,21 +1,17 @@
-const depatmentRepository = require('../repositories/depatmentRepository');
+const departmentRepository = require('../repositories/departmentRepository');
 const employeeRepository = require('../repositories/employeeRepository')
 const employeeShiftRepository = require('../repositories/employeeShiftRepository')
+const { findManagerNameById, findShiftIds } = require('../utils/utils');
 
 const getAllDepartments = (filters) => {
-  return depatmentRepository.getAllDepartments(filters);
+  return departmentRepository.getAllDepartments(filters);
 };
 
 const getDepartmentById = async (id) => {
-  const department = await depatmentRepository.getDepartmentById(id);
+  const department = await departmentRepository.getDepartmentById(id);
   const employees = await employeeRepository.getAllEmployees();
-  const employeesShifts = await employeeShiftRepository.getAllEmployeeShift();
 
-  const manager = employees.find(emp => emp._id.toString() === department.Manager.toString());
-  const managerName = manager ? `${manager.FirstName} ${manager.LastName}` : 'Unknown';
-
-  const departmentEmployees = employees.filter(employee => employee.DepartmentID.toString() === id);
-  const employeeIds = departmentEmployees.map(employee => employee._id.toString());
+  const managerName = findManagerNameById(department.Manager, employees);
 
   return {
     _id: department._id,
@@ -26,18 +22,12 @@ const getDepartmentById = async (id) => {
 };
 
 const addDepartment = (obj) => {
-  return depatmentRepository.addDepartment(obj);
+  return departmentRepository.addDepartment(obj);
 };
 
 const updateDepartment = (id, obj) => {
-  return depatmentRepository.updateDepartment(id, obj);
+  return departmentRepository.updateDepartment(id, obj);
 };
-
-/*
-const deleteDepartment = (id) => {
-  return depatmentRepository.deleteDepartment(id);
-};
-*/
 
 const deleteDepartment = async (id) => {
   const employees = await employeeRepository.getAllEmployees();
@@ -47,9 +37,7 @@ const deleteDepartment = async (id) => {
   const employeeIds = departmentEmployees.map(employee => employee._id.toString());
 
   // Delete employee shifts
-  const shiftIdsToDelete = employeesShifts
-      .filter(shift => employeeIds.includes(shift.EmployeeID.toString()))
-      .map(shift => shift._id);
+  const shiftIdsToDelete = findShiftIds(employeesShifts, employeeIds);
 
   await employeeShiftRepository.deleteMultipleEmployeeShifts(shiftIdsToDelete);
 
@@ -57,7 +45,7 @@ const deleteDepartment = async (id) => {
   await Promise.all(departmentEmployees.map(employee => employeeRepository.deleteEmployee(employee._id)));
 
   // Delete the department itself
-  await depatmentRepository.deleteDepartment(id);
+  await departmentRepository.deleteDepartment(id);
 
   return { message: "Department and associated data deleted successfully." };
 };
@@ -68,16 +56,13 @@ const getDepartmentsWithEmployees = async () => {
   const employees = await employeeRepository.getAllEmployees();
 
   const DepartmentsWithEmployees = departments.map(department => {
-
-    // find manager for the department
-    const manager = employees.find(emp => emp._id.toString() === department.Manager.toString());
-    const managerName = manager ? `${manager.FirstName} ${manager.LastName}` : 'Unknown';
+    const managerName = findManagerNameById(department.Manager, employees)
 
     // find employees who belong to this department
     const departmentEmployees = employees.filter(employee => employee.DepartmentID.toString() === department._id.toString());
     const employeesDetails = departmentEmployees.map(employee => ({
       employeeId: employee._id,
-      employeeName :`${employee.FirstName} ${employee.LastName}`
+      employeeName: `${employee.FirstName} ${employee.LastName}`
     }));
 
     return {
@@ -92,10 +77,10 @@ const getDepartmentsWithEmployees = async () => {
 }
 
 module.exports = {
-    getAllDepartments,
-    getDepartmentById,
-    addDepartment,
-    updateDepartment,
-    deleteDepartment, 
-    getDepartmentsWithEmployees
+  getAllDepartments,
+  getDepartmentById,
+  addDepartment,
+  updateDepartment,
+  deleteDepartment,
+  getDepartmentsWithEmployees
 };

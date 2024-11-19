@@ -40,7 +40,7 @@ const resetDailyActions = async () => {
   try {
     const users = await usersDBrepository.getAllUsers();
 
-    
+
     for (const user of users) {
       await usersDBrepository.updateUser(user._id, {
         RemainingAllowdActions: user.NumOfActions,
@@ -53,7 +53,27 @@ const resetDailyActions = async () => {
   }
 };
 
-module.exports = { resetDailyActions, getAllUsersDetails };
+// Decrement remaining Num Of Actions after performing an action
+const decrementUserActions = async (userId) => {
+  const user = await usersDBrepository.getUserById(userId);
+  if (user && user.RemainingAllowdActions > 0) {
+    user.RemainingAllowdActions -= 1;
+    return user.save();
+  }
+  return null; 
+};
+
+// get user from DB by id
+const getUserById = (id) => {
+  return usersDBrepository.getUserById(id);
+};
+
+module.exports = { 
+  resetDailyActions, 
+  getAllUsersDetails,
+  decrementUserActions,
+  getUserById 
+};
 
 
 

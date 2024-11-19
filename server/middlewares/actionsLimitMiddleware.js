@@ -1,17 +1,17 @@
-const usersDBservice = require('../services/userDBservice');
+const userService = require('../services/userService')
 
 const checkUserActionsLimit = async (req, res, next)  => {
    
     const userId = req.user.id;
-    const user = await usersDBservice.getUserById(userId);
+    const user = await userService.getUserById(userId);
 
     if (user && user.RemainingAllowdActions > 0){
 
       console.log('before dec', user.RemainingAllowdActions)
       
-      await usersDBservice.decrementUserActions(userId);
+      await userService.decrementUserActions(userId);
 
-      const updatedUser = await usersDBservice.getUserById(userId);
+      const updatedUser = await userService.getUserById(userId);
 
       console.log('after dec', updatedUser.RemainingAllowdActions);
       

@@ -89,27 +89,24 @@
             const departmentId = new URLSearchParams(location.search).get('id');
             const token = sessionStorage.getItem('token');
 
-            const updatedEmployee = {
-                DepartmentID: departmentId
-            };
-
-            const resp = await fetch(`${employeesURL}/${employeeId}`, {
-                method: 'PATCH',
+            const resp = await fetch(`${departmentsURL}/${departmentId}`, {
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     'x-access-token': token,
                 },
-                body: JSON.stringify(updatedEmployee)
             });
 
             if (resp.ok) {
-                console.log('Employee updated successfully');
+                console.log('Department deleted successfully.');
+                location.href = 'departmentPage.html';
             } else {
-                console.log('Failed to update employee. Please try again.');
+                console.log('Failed to delete department. Please try again.');
             }
 
         };
-        //---------------------------------------------------
+        //----------------------------------------------------
+
         //-------------- add options to dropdown --------------
         const populateDropdown = (dropdownId, data, defaultOptionText, displayTextCallback) => {
             const dropdown = document.getElementById(dropdownId);
@@ -123,7 +120,7 @@
             });
         };
         const employeesDropdownData = async () => {
-            populateDropdown('employeesDropdown', employees , 'All Employees', employee => `${employee.FirstName} ${employee.LastName}`);
+            populateDropdown('employeesDropdown', employees, 'All Employees', employee => `${employee.FirstName} ${employee.LastName}`);
         };
         //------------------------------------------------------
 
