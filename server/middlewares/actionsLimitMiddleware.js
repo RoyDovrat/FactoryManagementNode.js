@@ -1,4 +1,4 @@
-const userService = require('../services/userService')
+
 /*
 const checkUserActionsLimit = async (req, res, next)  => {
    
@@ -22,7 +22,8 @@ const checkUserActionsLimit = async (req, res, next)  => {
     }
 
 }
-*/
+
+const userService = require('../services/userService')
 
 const checkUserActionsLimit = async (req, res, next)  => {
    
@@ -49,6 +50,32 @@ const checkUserActionsLimit = async (req, res, next)  => {
 
 }
   
+module.exports = checkUserActionsLimit;
+*/
 
+const userService = require('../services/userService')
+
+const checkUserActionsLimit = async (req, res, next) => {
+  try {
+    const userDBid = req.user.userDBid;
+    const externalUserId = req.user.externalUserId;
+
+    // Fetch and decrement user actions
+    const updatedUser = await userService.decrementUserActions(userDBid);
+
+    // Log user action only after a successful decrement
+    await userService.addUserActionToFile(updatedUser, externalUserId);
+
+    next();
+  } catch (error) {
+    console.error('Error in checkUserActionsLimit middleware:', error.message);
+
+    if (error.message === 'User has no remaining actions.') {
+      res.status(403).json({ message: 'Action limit reached. Try again tomorrow.' });
+    } else {
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  }
+};
 
 module.exports = checkUserActionsLimit;

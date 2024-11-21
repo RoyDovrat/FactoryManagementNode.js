@@ -17,6 +17,7 @@ const addUser = (obj) => {
   return user.save();
 };
 
+
 const updateUser = (id, obj) => {
   return User.findByIdAndUpdate(id, obj);
 };
