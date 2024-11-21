@@ -1,103 +1,111 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script>
- 
-            const departmentsURL = 'http://localhost:3000/departments';
 
-            //-------------- handle  fetch requests --------------
-            const fetchData = async (url) => {
-                const token = sessionStorage.getItem('token');
+<head>
+    <script>
 
-                try {
-                    const resp = await fetch(`${url}`, {
-                        headers: { 'x-access-token': token },
-                    });
-                    return await resp.json();
-                } catch (error) {
-                    console.log(`Fetch error for ${url}`);
-                    alert('An error occurred while fetching data. Please try again.');
-                }
-            };
-        
+        const departmentsURL = 'http://localhost:3000/departments';
 
-            //------add information to department table------
-            const displayDepartmentsTable  = async () => {
-                const departments = await fetchData(`${departmentsURL}/withDetails`);
-                const departmentTable = document.getElementById('departmentTable');
-                departmentTable.innerHTML = '';
+        //-------------- handle  fetch requests --------------
+        const fetchData = async (url) => {
+            const token = sessionStorage.getItem('token');
 
-                departments.forEach(department => {
-                    const row = document.createElement('tr');
+            try {
+                const resp = await fetch(`${url}`, {
+                    headers: { 'x-access-token': token },
+                });
+                return await resp.json();
+            } catch (error) {
+                console.log(`Fetch error for ${url}`);
+                alert('An error occurred while fetching data. Please try again.');
+            }
+        };
 
-                    const departmentLink = `<a href="editDepartment.html?id=${department._id}">${department.Name}</a>`;
-                    const managerName = department.managerName;
-                    const departmentEmployees = department.employeesDetails.map(employee => `<a href="editEmployee.html?id=${employee.employeeId}">${employee.employeeName}</a>`).join(', ');
 
-                    row.innerHTML = `
+        //------add information to department table------
+        const displayDepartmentsTable = async () => {
+            const departments = await fetchData(`${departmentsURL}/withDetails`);
+            const departmentTable = document.getElementById('departmentTable');
+            departmentTable.innerHTML = '';
+
+            departments.forEach(department => {
+                const row = document.createElement('tr');
+
+                const departmentLink = `<a href="editDepartment.html?id=${department._id}">${department.Name}</a>`;
+                const managerNameLink = `<a href="editEmployee.html?id=${department.manager.managerId}">${department.manager.managerName}</a>`;
+                const managerName = department.manager.managerName;
+
+                const nonManagerEmployees = department.employeesDetails.filter(
+                    employee => employee.employeeName !== managerName
+                );
+
+                const departmentEmployees = nonManagerEmployees.map(employee => `<a href="editEmployee.html?id=${employee.employeeId}">${employee.employeeName}</a>`).join(', ');
+
+                row.innerHTML = `
                     <td>${departmentLink}</td>
-                    <td>${managerName}</td>
+                    <td>${managerNameLink}</td>
                     <td>${departmentEmployees}</td>
                     `;
 
-                    departmentTable.appendChild(row);
+                departmentTable.appendChild(row);
 
-                });
-            };
-            //--------------------------------------------------
+            });
+        };
+        //--------------------------------------------------
 
-            const pageDisplay = async () => {
-                const token = sessionStorage.getItem('token');
-                const fullName = sessionStorage.getItem('fullName');
+        const pageDisplay = async () => {
+            const token = sessionStorage.getItem('token');
+            const fullName = sessionStorage.getItem('fullName');
 
-                if (!token) {
-                    alert("Please log in first.");
-                    location.href = 'loginPage.html'; 
-                } else {
-                    document.getElementById('fullName').innerText = fullName;
-                    await displayDepartmentsTable();
-                }
-            };
+            if (!token) {
+                alert("Please log in first.");
+                location.href = 'loginPage.html';
+            } else {
+                document.getElementById('fullName').innerText = fullName;
+                await displayDepartmentsTable();
+            }
+        };
 
-            //-------------------- user log out -------------------- 
-            function logout() {
-                if (confirm("Are you sure you want to log out?")) {
-                    sessionStorage.clear(); 
-                    location.href = 'loginPage.html'; 
-                }
-            };
-            //------------------------------------------------------
-        </script>
-    </head>
+        //-------------------- user log out -------------------- 
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                sessionStorage.clear();
+                location.href = 'loginPage.html';
+            }
+        };
+        //------------------------------------------------------
+    </script>
+</head>
 
-    <body onload="pageDisplay()">
-        <h1>Department Page</h1>
+<body onload="pageDisplay()">
+    <h1>Department Page</h1>
 
-        <!-- Display user's full name -->
-        <p>Welcome, <span id="fullName"></span></p>
-        <!------------------------------>
+    <!-- Display user's full name -->
+    <p>Welcome, <span id="fullName"></span></p>
+    <!------------------------------>
 
-        <!--log out option-->
-        <a href="#" onclick="logout()">Log Out</a><br><br>
-        <!------------------->
+    <!--log out option-->
+    <a href="#" onclick="logout()">Log Out</a><br><br>
+    <!------------------->
 
-        <!-- Table of departments -->
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Department name</th>
-                    <th>Department manager name</th>
-                    <th>Employees names</th>
-                </tr>
-            </thead>
-            <tbody id="departmentTable">
-            </tbody>
-        </table> <br><br>
-        <!------------------->
+    <!-- Table of departments -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Department name</th>
+                <th>Department manager name</th>
+                <th>Employees names</th>
+            </tr>
+        </thead>
+        <tbody id="departmentTable">
+        </tbody>
+    </table> <br><br>
+    <!------------------->
 
-        <!-- add new depatment -->
-        <button onclick="location.href='newDepartment.html'">Add Department</button> 
-        <!---------------------->
+    <!-- add new depatment -->
+    <button onclick="location.href='newDepartment.html'">Add Department</button>
+    <!---------------------->
 
-    </body>
+</body>
+
 </html>

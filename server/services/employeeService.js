@@ -69,9 +69,10 @@ const updateEmployee = (id, obj) => {
 const deleteEmployee = async (id) => {
   const { departments } = await fetchData();
   const isManager = await isEmployeeManager(departments, id);
+  console.log('isManager', isManager)
   if (isManager) {
-    return { message: "This employee is a manager and cannot be deleted." };
-  }
+    throw new Error("This employee is a manager and cannot be deleted.");
+}
 
   // delete employee shifts
   const { employeesShifts } = await fetchData();

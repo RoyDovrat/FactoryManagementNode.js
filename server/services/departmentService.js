@@ -68,7 +68,11 @@ const getDepartmentsWithEmployees = async () => {
     return {
       _id: department._id,
       Name: department.Name,
-      managerName,
+      manager: {
+        managerName,
+        managerId: department.Manager
+      },
+
       employeesDetails
     };
 

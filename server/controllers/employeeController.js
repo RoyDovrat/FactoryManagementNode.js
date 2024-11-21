@@ -90,7 +90,7 @@ router.delete('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
     const result = await employeeService.deleteEmployee(id);
     res.json(result);
   } catch (error) {
-    res.json(error);
+    res.status(400).json({ message: error.message });
   }
 
 });

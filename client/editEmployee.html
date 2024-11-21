@@ -70,9 +70,9 @@
                 employeeShifts.forEach(shift => {
                     const row = document.createElement('tr');
                     const shiftCell = document.createElement('td');
-                    shiftCell.innerHTML = shift; // Insert shift info into cell
+                    shiftCell.innerHTML = shift;
                     row.appendChild(shiftCell);
-                    employeeShiftTable.appendChild(row); // Add row to table
+                    employeeShiftTable.appendChild(row);
                 });
             } else {
 
@@ -228,6 +228,12 @@
             }
         };
         //------------------------------------------------------
+        
+        //-------------- back to employees page --------------
+        const cancel = () => {
+            location.href = 'employeePage.html';
+        };
+        //----------------------------------------------------
 
 
     </script>
@@ -278,9 +284,9 @@
         <option value="">All Shifts</option>
     </select>
     <!--------------------------->
-    <button type="button" onclick="RegisterEmployeeToShift()">Register To Shift</button>
+    <button type="button" onclick="RegisterEmployeeToShift()">Register To Shift</button> <br><br><br>
 
-
+    <button type="button" onclick="cancel()">Cancel</button>
 
 </body>
 

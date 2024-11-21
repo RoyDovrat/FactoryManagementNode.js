@@ -35,7 +35,7 @@ const findDepartmentNameById = (departments, departmentId) => {
 };
 
 const isEmployeeManager = async (departments, employeeId) => {
-  return departments.some(department => department.Manager === employeeId);
+  return departments.some(department => department.Manager.toString() === employeeId.toString());
 };
 
 module.exports = {
