@@ -26,6 +26,7 @@
 
         const loadData = async (employeeId) => {
             employeeDetails = await fetchData(`${employeesURL}/${employeeId}`);
+            console.log(employeeDetails)
         }
         //----------------------------------------------------------
 
@@ -122,8 +123,8 @@
             });
 
             if (resp.ok) {
-                alert('employee shift successfully added');
                 EmployeeShiftsInfo(employeeId);
+                alert('employee shift successfully added');
             } else {
                 alert('Failed to add employee shift. Please try again.');
             }
@@ -167,42 +168,12 @@
         };
         //-------------------------------------------------------
 
-        //----------- Check if employee is a manager -----------
-        const isEmployeeManager = (employeeId) => {
-            return employeeDetails.data.allDerpartments.some(department => department.Manager === employeeId);
-        };
-        //------------------------------------------------------
 
         //-------- Delete employee data from the server --------
         const deleteEmployee = async () => {
             const employeeId = new URLSearchParams(location.search).get('id');
             const token = sessionStorage.getItem('token');
-
-            // Check if employee is a manager
-            const isManager = await isEmployeeManager(employeeId);
-            if (isManager) {
-                alert("This employee is a manager and cannot be deleted.");
-                return;
-            }
-
-            const employeeShift = employeeDetails.data.allEmployeesShifts.filter(es => es.EmployeeID == employeeId).map(shift => shift._id); // array of shift IDs
-
-            if (employeeShift.length > 0) {
-                const resp = await fetch(employeeShiftURL, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-access-token': token
-                    },
-                    body: JSON.stringify({ shiftIds: employeeShift })
-                });
-
-                if (resp.ok) {
-                    console.log('Employee shifts deleted successfully.');
-                } else {
-                    console.log('Failed to delete employee shifts. Please try again.');
-                }
-            }
+            console.log('employeeid to delete', employeeId)
 
             const resp = await fetch(`${employeesURL}/${employeeId}`, {
                 method: 'DELETE',
@@ -210,13 +181,13 @@
                     'Content-Type': 'application/json',
                     'x-access-token': token,
                 },
-                body: JSON.stringify({ employeeId })
             });
 
             if (resp.ok) {
-                console.log('Employee deleted successfully');
+                alert('Employee deleted successfully');
+                location.href = 'employeePage.html';
             } else {
-                console.log('Failed to delete employee. Please try again.');
+                alert('Failed to delete employee. Please try again');
             }
 
         };
@@ -224,7 +195,6 @@
 
         const loadPageData = async (departmentId = '') => {
             const employeeId = new URLSearchParams(location.search).get('id');
-
             await loadData(employeeId);
             await formInitialize();
             await DepartmentDropdownData();

@@ -86,6 +86,7 @@ router.delete('/:id', verifyToken, checkUserActionsLimit, async (req, res) => {
 
   try {
     const { id } = req.params;
+    console.log('in controller, id', id)
     const result = await employeeService.deleteEmployee(id);
     res.json(result);
   } catch (error) {

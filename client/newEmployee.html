@@ -1,134 +1,159 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script>
-            const employeesURL = 'http://localhost:3000/employees';
-            const departmentsURL = 'http://localhost:3000/departments';            
 
+<head>
+    <script>
+        const employeesURL = 'http://localhost:3000/employees';
+        const departmentsURL = 'http://localhost:3000/departments';
 
-            //-------------- handle  fetch requests --------------
-            const fetchData = async (url) => {
-                const token = sessionStorage.getItem('token');
+        //-------------- handle  fetch requests --------------
+        const fetchData = async (url) => {
+            const token = sessionStorage.getItem('token');
 
-                try {
-                    const resp = await fetch(`${url}`, {
-                        headers: { 'x-access-token': token },
-                    });
-                    return await resp.json();
-                } catch (error) {
-                    console.log(`Fetch error for ${url}`);
-                    alert('An error occurred while fetching data. Please try again.');
-                }
-            };
-            //------------------------------------------------------
-
- 
-            //--------- add options to departments drop down -------
-            const DepartmentDropdownData = async () => {
-
-                const departments = await fetchData(`${departmentsURL}`);
-
-                const departmentDropdown = document.getElementById('departmentDropdown');
-                departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
-
-                departments.forEach(department => {
-                    
-                        const option = document.createElement('option');
-                        departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
-                    
+            try {
+                const resp = await fetch(`${url}`, {
+                    headers: { 'x-access-token': token },
                 });
+                return await resp.json();
+            } catch (error) {
+                console.log(`Fetch error for ${url}`);
+                alert('An error occurred while fetching data. Please try again.');
+            }
+        };
+        //------------------------------------------------------
+
+        //--------- add options to departments drop down -------
+        const DepartmentDropdownData = async () => {
+
+            const departments = await fetchData(`${departmentsURL}`);
+
+            const departmentDropdown = document.getElementById('departmentDropdown');
+            departmentDropdown.innerHTML = '<option value="">All Departments</option>'; // Default option
+
+            departments.forEach(department => {
+
+                const option = document.createElement('option');
+                departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
+
+            });
+        };
+        //-------------------------------------------------------
+
+        //------------------ add new employee  ------------------
+        const validateInputs = (firstName, lastName, startWorkYear, departmentId) => {
+            if (!firstName || !lastName || !startWorkYear || !departmentId) {
+                alert('Please fill in all the fields');
+                return false;
+            }
+            return true;
+        };
+
+        const validateStartWorkYear = (startWorkYear) => {
+            const currentYear = new Date().getFullYear();
+            if (startWorkYear < 1900 || startWorkYear > currentYear) {
+                alert(`Start Work Year must be between 1900 and ${currentYear}.`);
+                return false;
+            }
+            return true;
+        };
+
+        const sendEmployeeData = async (employee, token) => {
+            const resp = await fetch(employeesURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token,
+                },
+                body: JSON.stringify(employee),
+            });
+
+            if (resp.ok) {
+                alert('New employee successfully added');
+            } else {
+                alert('Failed to add new employee. Please try again.');
+            }
+        };
+
+        const addEmployee = async () => {
+            const token = sessionStorage.getItem('token');
+
+            const firstName = document.getElementById('employeeFirstName').value.trim();
+            const lastName = document.getElementById('employeeLastName').value.trim();
+            const startWorkYear = document.getElementById('startWorkYear').value.trim();
+            const departmentId = document.getElementById('departmentDropdown').value;
+
+            if (!validateInputs(firstName, lastName, startWorkYear, departmentId)) return;
+            if (!validateStartWorkYear(startWorkYear)) return;
+
+            const updatedEmployee = {
+                FirstName: firstName,
+                LastName: lastName,
+                StartWorkYear: parseInt(startWorkYear, 10),
+                DepartmentID: departmentId
             };
-            //------------------------------------------------------
-            
-            //------------------ add new employee  ------------------
-            const addEmployee = async () => {
-                const token = sessionStorage.getItem('token');
 
-                const departmentDropdown = document.getElementById('departmentDropdown');
-                const departmentId = departmentDropdown.value;
-    
-                const updatedEmployee = {
-                    FirstName: document.getElementById('employeeFirstName').value,
-                    LastName: document.getElementById('employeeLastName').value,
-                    StartWorkYear: document.getElementById('startWorkYear').value,
-                    DepartmentID: departmentId 
-                };
+            await sendEmployeeData(updatedEmployee, token);
+        };
+        //----------------------------------------------------
 
-                // Send POST request
-                const resp = await fetch(employeesURL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-access-token': token,
-                    },
-                    body: JSON.stringify(updatedEmployee)
-                });
+        //-------------- back to employees page --------------
+        const cancel = () => {
+            location.href = 'employeePage.html';
+        };
+        //----------------------------------------------------
 
-                if (resp.ok) {
-                    alert('New employee successfully added');
-                } else {
-                    alert('Failed to add new employee. Please try again.');
-                }
-            };
-            //-----------------------------------------------------
-            
-            //-------------- back to employees page --------------
-            const cancel = () => {
-                location.href = 'employeePage.html'; 
-            };
-            //----------------------------------------------------
+        const pageDisplay = async () => {
+            const token = sessionStorage.getItem('token');
+            const fullName = sessionStorage.getItem('fullName');
 
-            const pageDisplay = async () => {
-                const token = sessionStorage.getItem('token');
-                const fullName = sessionStorage.getItem('fullName');
+            if (!token) {
+                alert("Please log in first.");
+                location.href = 'loginPage.html';
+            } else {
+                document.getElementById('fullName').innerText = fullName;
+                await DepartmentDropdownData();
+            }
+        };
 
-                if (!token) {
-                    alert("Please log in first.");
-                    location.href = 'loginPage.html'; 
-                } else {
-                    document.getElementById('fullName').innerText = fullName;
-                    await DepartmentDropdownData();
-                }       
-            };
+        //-------------------- user log out -------------------- 
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                sessionStorage.clear();
+                location.href = 'loginPage.html';
+            }
+        };
+        //-----------------------------------------------------
 
-            //-------------------- user log out -------------------- 
-            function logout() {
-                if (confirm("Are you sure you want to log out?")) {
-                    sessionStorage.clear(); 
-                    location.href = 'loginPage.html'; 
-                }
-            };
-            //-----------------------------------------------------
+    </script>
+</head>
 
-        </script>
-    </head>
+<body onload="pageDisplay()">
+    <h1>New Employees Page</h1>
 
-    <body onload="pageDisplay()">
-        <h1>New Employees Page</h1>
+    <!-- Display user's full name -->
+    <p>Welcome, <span id="fullName"></span></p>
+    <!------------------------------>
 
-        <!-- Display user's full name -->
-        <p>Welcome, <span id="fullName"></span></p>
-        <!------------------------------>
+    <!--log out option-->
+    <a href="" onclick="logout()">Log Out</a><br><br>
+    <!------------------>
 
-        <!--log out option-->
-        <a href="" onclick="logout()">Log Out</a><br><br>
-        <!------------------>
+    <!--form to add employee-->
+    <form id="employeeForm">
+        First Name: <input type="text" id="employeeFirstName" required>
+        <br><br>
+        Last Name: <input type="text" id="employeeLastName" required>
+        <br><br>
+        Start Work Year: <input type="number" id="startWorkYear" required min="1900">
+        <br><br>
+        Department: <select id="departmentDropdown">
+        </select> <br><br>
+    </form>
+    <!------------------>
 
-          <!--form to add employee-->
-        <form id="employeeForm">
-            First Name: <input type="text" id="employeeFirstName" required>
-            <br><br>
-            Last Name: <input type="text" id="employeeLastName" required>
-            <br><br>
-            Start Work Year: <input type="number" id="startWorkYear" required>
-            <br><br>
-            Department: <select id="departmentDropdown">
-            </select> <br><br>
-        </form>
-        <!------------------>
+    <button type="button" onclick="addEmployee()">Save</button>
+    <button type="button" onclick="cancel()">Cancel</button>
 
-        <button type="button" onclick="addEmployee()">Save</button>
-        <button type="button" onclick="cancel()">Cancel</button>
+</body>
 
-    </body>
 </html>

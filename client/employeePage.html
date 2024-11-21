@@ -87,6 +87,7 @@
 
             } else {
                 document.getElementById('fullName').innerText = fullName;
+                
                 const uniqueDepartments = await loadPageData();
                 await populateDepartmentDropdown(uniqueDepartments);
             }
