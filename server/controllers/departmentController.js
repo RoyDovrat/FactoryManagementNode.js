@@ -54,7 +54,7 @@ router.post('/', verifyToken, checkUserActionsLimit, async (req, res) => {
     const result = await departmentsService.addDepartment(obj);
     res.status(201).json(result);
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ message: error.message });
   }
 
 });

@@ -21,9 +21,31 @@ const getDepartmentById = async (id) => {
   };
 };
 
+
+const checkDepartmentExists = async (obj) => {
+  const existingEmployees = await getAllDepartments();
+
+  return existingEmployees.some(dep =>
+    dep.Name.toLowerCase() === obj.Name.toLowerCase() 
+  );
+}
+
+const addDepartment = async (obj) => {
+  const DepartmentExists = await checkDepartmentExists(obj);
+
+  if (DepartmentExists) {
+    throw new Error('Department with the same name already exists.');
+  }
+
+  return departmentRepository.addDepartment(obj);
+};
+
+/*
 const addDepartment = (obj) => {
   return departmentRepository.addDepartment(obj);
 };
+*/
+
 
 const updateDepartment = (id, obj) => {
   return departmentRepository.updateDepartment(id, obj);
