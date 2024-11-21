@@ -1,3 +1,4 @@
+/*
 const userRepository = require('../repositories/usersDBrepository');
 
 const getAllUsers = (filters) => {
@@ -33,6 +34,7 @@ const decrementUserActions = async (userId) => {
   return null; 
 };
 
+
 // Reset user's action count (at the end of the day)
 const resetUserActions = async () => {
   const users = await getAllUsers();
@@ -58,3 +60,4 @@ module.exports = {
   resetUserActions,
   deleteUser
 };
+*/

@@ -1,5 +1,5 @@
 const userService = require('../services/userService')
-
+/*
 const checkUserActionsLimit = async (req, res, next)  => {
    
     const userId = req.user.id;
@@ -22,5 +22,33 @@ const checkUserActionsLimit = async (req, res, next)  => {
     }
 
 }
+*/
+
+const checkUserActionsLimit = async (req, res, next)  => {
+   
+  const userDBid = req.user.userDBid;
+  const externalUserId = req.user.externalUserId
+
+  const user = await userService.getUserById(userDBid);
+
+  if (user && user.RemainingAllowdActions > 0){
+
+    console.log('before dec', user.RemainingAllowdActions)
+    
+    await userService.decrementUserActions(user, externalUserId);
+
+    const updatedUser = await userService.getUserById(userDBid);
+
+    console.log('after dec', updatedUser.RemainingAllowdActions);
+    
+    next();
+
+  }  else {
+    res.status(403).json('Action limit reached. Try again tomorrow.');
+  }
+
+}
+  
+
 
 module.exports = checkUserActionsLimit;

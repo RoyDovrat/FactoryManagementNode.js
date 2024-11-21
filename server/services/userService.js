@@ -1,5 +1,6 @@
 const usersDBrepository = require('../repositories/usersDBrepository');
 const usersWSrepository = require('../repositories/usersWSrepository');
+const userActionRepository = require('../repositories/userActionRepository')
 
 const getAllUsersDetails = async () => {
   try {
@@ -18,7 +19,8 @@ const getAllUsersDetails = async () => {
       }
 
       return {
-        _id: UserDB._id,
+        UserDBid: UserDB._id,
+        externalUserId: externalUser.id,
         username: externalUser.username,
         name: UserDB.FullName,
         email: externalUser.email,
@@ -27,7 +29,7 @@ const getAllUsersDetails = async () => {
       };
     });
 
-    
+
     return combinedUsers.filter(user => user !== null); // filter out any unmatched users 
   } catch (error) {
     console.log(`Error in getAllUsersDetails: ${error.message}`);
@@ -54,6 +56,7 @@ const resetDailyActions = async () => {
 };
 
 // Decrement remaining Num Of Actions after performing an action
+/*
 const decrementUserActions = async (userId) => {
   const user = await usersDBrepository.getUserById(userId);
   if (user && user.RemainingAllowdActions > 0) {
@@ -63,16 +66,38 @@ const decrementUserActions = async (userId) => {
   return null; 
 };
 
+const addUserActionToFile = async (user, externalUserId) => {
+  const usersActions = await userActionRepository.getUsersActions();
+  const newUserAction = {
+    id: externalUserId,
+    maxAction: user.NumOfActions,
+    actionsAllowd: user.RemainingAllowdActions
+  };
+  usersActions.actions.push(newUserAction);
+  userActionRepository.setUsersActions(usersActions);
+  return newUserAction.id;
+};
+*/
+
+const decrementUserActions = async (user, externalUserId) => {
+  user.RemainingAllowdActions -= 1;
+
+  //addUserActionToFile(user, externalUserId);
+
+  return user.save();
+
+};
+
 // get user from DB by id
 const getUserById = (id) => {
   return usersDBrepository.getUserById(id);
 };
 
-module.exports = { 
-  resetDailyActions, 
+module.exports = {
+  resetDailyActions,
   getAllUsersDetails,
   decrementUserActions,
-  getUserById 
+  getUserById
 };
 
 
