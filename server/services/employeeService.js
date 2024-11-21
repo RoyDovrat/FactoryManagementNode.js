@@ -2,7 +2,7 @@ const employeeRepository = require('../repositories/employeeRepository');
 const departmentRepository = require('../repositories/departmentRepository');
 const shiftRepository = require('../repositories/shiftRepository');
 const employeeShiftRepository = require('../repositories/employeeShiftRepository')
-const { findEmployeeShifts, findDepartmentNameById } = require('../utils/utils');
+const { findEmployeeShifts, findDepartmentNameById, findShiftIds, isEmployeeManager } = require('../utils/utils');
 
 const fetchData = async () => {
   return {
@@ -65,28 +65,22 @@ const updateEmployee = (id, obj) => {
   return employeeRepository.updateEmployee(id, obj);
 };
 
-/*
-const deleteEmployee = (id) => {
-  return employeeRepository.deleteEmployee(id);
-};
-*/
-
-const isEmployeeManager = async (employeeId) => {
-  const { departments } = await fetchData();
-  return departments.some(department => department.Manager === employeeId);
-};
 
 const deleteEmployee = async (id) => {
-  console.log('in service delete', id)
-  const isManager = await isEmployeeManager(id);
+  const { departments } = await fetchData();
+  const isManager = await isEmployeeManager(departments, id);
   if (isManager) {
     return { message: "This employee is a manager and cannot be deleted." };
   }
 
+  // delete employee shifts
   const { employeesShifts } = await fetchData();
-  const employeeShiftToDelete = employeesShifts.filter(es => es.EmployeeID == id).map(shift => shift._id); // array of shift IDs
-  await employeeShiftRepository.deleteMultipleEmployeeShifts(employeeShiftToDelete)
+  const employeeShiftToDelete = findShiftIds(employeesShifts, [id]);
+  if (employeeShiftToDelete.length > 0) {
+    await employeeShiftRepository.deleteMultipleEmployeeShifts(employeeShiftToDelete);
+  }
 
+  //delete employee
   await employeeRepository.deleteEmployee(id);
 
   return { message: "Employees and associated data deleted successfully." };

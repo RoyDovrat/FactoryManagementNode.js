@@ -26,7 +26,6 @@
 
         const loadData = async (employeeId) => {
             employeeDetails = await fetchData(`${employeesURL}/${employeeId}`);
-            console.log(employeeDetails)
         }
         //----------------------------------------------------------
 
@@ -47,11 +46,14 @@
 
             employeeDetails.data.allDerpartments.forEach(department => {
                 const option = document.createElement('option');
-                departmentDropdown.innerHTML += `<option value="${department._id}">${department.Name}</option>`;
+                option.value = department._id;
+                option.textContent = department.Name;
 
                 if (department._id === employeeDetails.employeeDepartmentId) {
-                    option.selected = true; // Mark as selected if it matches the current department
+                    option.selected = true;
                 }
+
+                departmentDropdown.appendChild(option);
             });
         };
         //----------------------------------------------------------
@@ -123,15 +125,16 @@
             });
 
             if (resp.ok) {
-                EmployeeShiftsInfo(employeeId);
                 alert('employee shift successfully added');
+                await loadData(employeeId);
+                await EmployeeShiftsInfo();
+                await shiftsDropdownData();
             } else {
                 alert('Failed to add employee shift. Please try again.');
             }
 
         }
         //------------------------------------------------------
-
 
 
         //-------- Update employee data on the server --------
@@ -173,7 +176,6 @@
         const deleteEmployee = async () => {
             const employeeId = new URLSearchParams(location.search).get('id');
             const token = sessionStorage.getItem('token');
-            console.log('employeeid to delete', employeeId)
 
             const resp = await fetch(`${employeesURL}/${employeeId}`, {
                 method: 'DELETE',
