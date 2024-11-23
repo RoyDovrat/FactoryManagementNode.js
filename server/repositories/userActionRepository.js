@@ -7,10 +7,13 @@ const getUsersActions = () => {
 };
 
 const setUsersActions = (userAction) => {
+
     jf.writeFile(FILE, userAction);
 };
 
+
 module.exports = {
     getUsersActions,
-    setUsersActions
+    setUsersActions,
+
 };

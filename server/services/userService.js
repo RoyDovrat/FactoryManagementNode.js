@@ -56,7 +56,6 @@ const resetDailyActions = async () => {
 };
 
 // Decrement remaining Num Of Actions after performing an action
-/*
 const decrementUserActions = async (userId) => {
   const user = await usersDBrepository.getUserById(userId);
   if (user && user.RemainingAllowdActions > 0) {
@@ -66,6 +65,7 @@ const decrementUserActions = async (userId) => {
   return null; 
 };
 
+/*
 const addUserActionToFile = async (user, externalUserId) => {
   const usersActions = await userActionRepository.getUsersActions();
   const newUserAction = {
@@ -78,61 +78,7 @@ const addUserActionToFile = async (user, externalUserId) => {
   return newUserAction.id;
 };
 
-
-const decrementUserActions = async (user, externalUserId) => {
-  user.RemainingAllowdActions -= 1;
-
-  addUserActionToFile(user, externalUserId);
-
-  return user.save();
-
-};
 */
-const addUserActionToFile = async (user, externalUserId) => {
-  try {
-    const usersActions = await userActionRepository.getUsersActions();
-
-    // Ensure the external user entry is unique
-    const existingAction = usersActions.actions.find(action => action.id === externalUserId);
-    if (!existingAction) {
-      const newUserAction = {
-        id: externalUserId,
-        maxAction: user.NumOfActions,
-        actionsAllowd: user.RemainingAllowdActions,
-      };
-
-      usersActions.actions.push(newUserAction);
-      await userActionRepository.setUsersActions(usersActions);
-
-      console.log('Logged user action:', newUserAction);
-    } else {
-      console.log('Action already logged for this user.');
-    }
-  } catch (error) {
-    console.error('Error in addUserActionToFile:', error.message);
-    throw error;
-  }
-};
-
-const decrementUserActions = async (userId) => {
-  try {
-    const user = await usersDBrepository.getUserById(userId);
-
-    if (user.RemainingAllowdActions > 0) {
-      const updatedUser = await usersDBrepository.updateUser(userId, {
-        RemainingAllowdActions: user.RemainingAllowdActions - 1,
-      });
-
-      console.log(`Decremented actions for user ${user.FullName}. Remaining: ${updatedUser.RemainingAllowdActions}`);
-      return updatedUser;
-    } else {
-      throw new Error('User has no remaining actions.');
-    }
-  } catch (error) {
-    console.error('Error in decrementUserActions:', error.message);
-    throw error;
-  }
-};
 
 
 // get user from DB by id
@@ -145,7 +91,6 @@ module.exports = {
   getAllUsersDetails,
   decrementUserActions,
   getUserById,
-  addUserActionToFile
 };
 
 

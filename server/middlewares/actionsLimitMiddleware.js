@@ -22,60 +22,70 @@ const checkUserActionsLimit = async (req, res, next)  => {
     }
 
 }
-
+    module.exports = checkUserActionsLimit;
+    */
+/*
 const userService = require('../services/userService')
 
-const checkUserActionsLimit = async (req, res, next)  => {
-   
-  const userDBid = req.user.userDBid;
-  const externalUserId = req.user.externalUserId
+const checkUserActionsLimit = async (req, res, next) => {
+
+ const { userDBid, externalUserId } = req.user;
 
   const user = await userService.getUserById(userDBid);
 
-  if (user && user.RemainingAllowdActions > 0){
+  if (user && user.RemainingAllowdActions > 0) {
 
     console.log('before dec', user.RemainingAllowdActions)
-    
+
     await userService.decrementUserActions(user, externalUserId);
 
     const updatedUser = await userService.getUserById(userDBid);
 
     console.log('after dec', updatedUser.RemainingAllowdActions);
-    
+
     next();
 
-  }  else {
+  } else {
     res.status(403).json('Action limit reached. Try again tomorrow.');
   }
 
 }
-  
+
 module.exports = checkUserActionsLimit;
 */
 
-const userService = require('../services/userService')
+
+
+
+const userService = require('../services/userService');
 
 const checkUserActionsLimit = async (req, res, next) => {
+  const {userDBid} = req.user;
+
   try {
-    const userDBid = req.user.userDBid;
-    const externalUserId = req.user.externalUserId;
+    const user = await userService.getUserById(userDBid);
 
-    // Fetch and decrement user actions
-    const updatedUser = await userService.decrementUserActions(userDBid);
+    if (user && user.RemainingAllowdActions > 0) {
+      console.log('before decrement:', user.RemainingAllowdActions);
 
-    // Log user action only after a successful decrement
-    await userService.addUserActionToFile(updatedUser, externalUserId);
+      // Decrement the user's remaining actions
+      await userService.decrementUserActions(userDBid);
 
-    next();
-  } catch (error) {
-    console.error('Error in checkUserActionsLimit middleware:', error.message);
+      const updatedUser = await userService.getUserById(userDBid);
+      console.log('after decrement:', updatedUser.RemainingAllowdActions);
 
-    if (error.message === 'User has no remaining actions.') {
-      res.status(403).json({ message: 'Action limit reached. Try again tomorrow.' });
+      next();
     } else {
-      res.status(500).json({ message: 'Internal Server Error' });
+      res.status(403).json('Action limit reached. Try again tomorrow.');
     }
+  } catch (error) {
+    console.error('Error in action limit middleware:', error.message);
+    res.status(500).json('Internal server error');
   }
 };
 
 module.exports = checkUserActionsLimit;
+
+
+
+
