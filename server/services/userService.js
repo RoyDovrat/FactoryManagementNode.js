@@ -57,12 +57,20 @@ const resetDailyActions = async () => {
 
 // Decrement remaining Num Of Actions after performing an action
 const decrementUserActions = async (userId) => {
-  const user = await usersDBrepository.getUserById(userId);
-  if (user && user.RemainingAllowdActions > 0) {
-    user.RemainingAllowdActions -= 1;
-    return user.save();
+  try {
+    const user = await usersDBrepository.getUserById(userId);
+    if (user && user.RemainingAllowdActions > 0) {
+      const RemainingAllowdActions = user.RemainingAllowdActions - 1;
+
+      await usersDBrepository.updateUser(user._id, {
+        RemainingAllowdActions
+      });
+    }
+    console.log('Successfully decrement User Actions.');
+  } catch (error) {
+    console.error('Error resetting daily actions:', error.message);
   }
-  return null; 
+
 };
 
 /*
