@@ -1,1 +1,10 @@
-{"actions":[{"id":1,"maxActions":100,"actionsAllowed":99,"timestamp":"2024-11-23T09:51:27.525Z"},{"id":1,"maxActions":100,"actionsAllowed":98,"timestamp":"2024-11-23T09:51:28.131Z"},{"id":1,"maxActions":100,"actionsAllowed":97,"timestamp":"2024-11-23T09:51:28.602Z"},{"id":1,"maxActions":100,"actionsAllowed":96,"timestamp":"2024-11-23T09:51:28.939Z"},{"id":1,"maxActions":100,"actionsAllowed":95,"timestamp":"2024-11-23T09:51:29.648Z"},{"id":1,"maxActions":100,"actionsAllowed":94,"timestamp":"2024-11-23T09:51:29.912Z"},{"id":1,"maxActions":100,"actionsAllowed":93,"timestamp":"2024-11-23T09:51:30.405Z"},{"id":1,"maxActions":100,"actionsAllowed":92,"timestamp":"2024-11-23T09:51:30.755Z"}]}
+{
+    "actions": [
+        {
+            "id": 1,
+            "date": "24/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 68
+        }
+    ]
+}

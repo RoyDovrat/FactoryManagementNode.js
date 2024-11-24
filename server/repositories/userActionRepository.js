@@ -1,15 +1,16 @@
+
 const jf = require('jsonfile');
 
 const FILE = 'data/usersActions.json';
 
-const getUsersActions = () => {
-    return jf.readFile(FILE);
+const getUsersActions = async () => {
+    return await jf.readFile(FILE);
 };
 
-const setUsersActions = (userAction) => {
-
-    jf.writeFile(FILE, userAction);
+const setUsersActions = async (userAction) => {
+    await jf.writeFile(FILE, userAction);
 };
+
 
 
 module.exports = {

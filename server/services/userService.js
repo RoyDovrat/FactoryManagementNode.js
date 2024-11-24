@@ -1,6 +1,7 @@
 const usersDBrepository = require('../repositories/usersDBrepository');
 const usersWSrepository = require('../repositories/usersWSrepository');
-const userActionRepository = require('../repositories/userActionRepository')
+const userActionRepository = require('../repositories/userActionRepository');
+const moment = require('moment');
 
 const getAllUsersDetails = async () => {
   try {
@@ -73,20 +74,22 @@ const decrementUserActions = async (userId) => {
 
 };
 
-/*
+//write new user action to json file
 const addUserActionToFile = async (user, externalUserId) => {
   const usersActions = await userActionRepository.getUsersActions();
+  const formattedDate = moment().format('DD/MM/YYYY');
+
   const newUserAction = {
     id: externalUserId,
+    date: formattedDate,
     maxAction: user.NumOfActions,
     actionsAllowd: user.RemainingAllowdActions
   };
+  
   usersActions.actions.push(newUserAction);
-  userActionRepository.setUsersActions(usersActions);
+  await userActionRepository.setUsersActions(usersActions);
   return newUserAction.id;
 };
-
-*/
 
 
 // get user from DB by id
@@ -99,6 +102,7 @@ module.exports = {
   getAllUsersDetails,
   decrementUserActions,
   getUserById,
+  addUserActionToFile
 };
 
 
