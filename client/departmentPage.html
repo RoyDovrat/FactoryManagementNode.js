@@ -2,6 +2,10 @@
 <html>
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
     <script>
 
         const departmentsURL = 'http://localhost:3000/departments';
@@ -77,35 +81,36 @@
     </script>
 </head>
 
-<body onload="pageDisplay()">
-    <h1>Department Page</h1>
+<body onload="pageDisplay()" class="bg-light">
+    <div class="container mt-5">
 
-    <!-- Display user's full name -->
-    <p>Welcome, <span id="fullName"></span></p>
-    <!------------------------------>
+        <!-- welcome message -->
+        <div class="text-center mb-4">
+            <h3 class="mb-3">Welcome, <span id="fullName"></span></h3>
+            <button class="btn btn-danger" onclick="logout()">Log Out</button>
+        </div> <br><br>
 
-    <!--log out option-->
-    <a href="#" onclick="logout()">Log Out</a><br><br>
-    <!------------------->
+        <!-- Table of departments -->
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Department name</th>
+                        <th>Department manager name</th>
+                        <th>Employees names</th>
+                    </tr>
+                </thead>
+                <tbody id="departmentTable">
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Table of departments -->
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Department name</th>
-                <th>Department manager name</th>
-                <th>Employees names</th>
-            </tr>
-        </thead>
-        <tbody id="departmentTable">
-        </tbody>
-    </table> <br><br>
-    <!------------------->
+        <!-- add new depatment button-->
+        <div class="text-center mt-4">
+            <a href="newDepartment.html" class="btn btn-secondary w-50">Add Department</a>
+        </div>
 
-    <!-- add new depatment -->
-    <button onclick="location.href='newDepartment.html'">Add Department</button>
-    <!---------------------->
-
+    </div>
 </body>
 
 </html>

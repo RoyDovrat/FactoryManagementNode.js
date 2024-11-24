@@ -1,50 +1,59 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script>
-           
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <script>
+
         const pageDisplay = async () => {
-              const token = sessionStorage.getItem('token');
-              const fullName = sessionStorage.getItem('fullName');
+            const token = sessionStorage.getItem('token');
+            const fullName = sessionStorage.getItem('fullName');
 
             // check if the user is logged in
             if (!token) {
-                location.href = 'loginPage.html'; 
+                location.href = 'loginPage.html';
             } else {
                 document.getElementById('fullName').innerText = fullName;
-            }       
+            }
         }
 
-        
+
         //------user log out------ 
         function logout() {
             if (confirm("Are you sure you want to log out?")) {
-                sessionStorage.clear(); 
-                location.href = 'loginPage.html'; 
+                sessionStorage.clear();
+                location.href = 'loginPage.html';
             }
         };
         //-------------------------
 
-        </script>
-    </head>
+    </script>
+</head>
 
-    <body onload="pageDisplay()">
-                    
-        <!-- display user's full name -->
-        <p>Welcome, <span id="fullName"></span></p>
-        <!------------------------------>
+<body onload="pageDisplay()" class="bg-light">
 
-        <!--log out option-->
-        <a href="" onclick="logout()">Log Out</a><br><br>
-        <!------------------>
+    <div class="container mt-5">
+
+        <!-- welcome message -->
+        <div class="text-center mb-4">
+            <h3 class="mb-3">Welcome, <span id="fullName"></span></h3>
+            <button class="btn btn-danger" onclick="logout()">Log Out</button>
+        </div> <br><br>
 
         <!-- navigation buttons -->
-        <button onclick="location.href='employeePage.html'">Employees Data</button> <br><br>
-        <button onclick="location.href='departmentPage.html'">Departments Data</button> <br><br>
-        <button onclick="location.href='usersPage.html'">Users Data</button> <br><br>
-        <button onclick="location.href='shiftsPage.html'">Shifts Data</button> <br><br>
-        <!------------------>
+        <div class="d-flex flex-column align-items-center gap-3">
+            <button class="btn btn-secondary w-50" onclick="location.href='employeePage.html'">Employees Data</button>
+            <button class="btn btn-secondary w-50" onclick="location.href='departmentPage.html'">Departments
+                Data</button>
+            <button class="btn btn-secondary w-50" onclick="location.href='usersPage.html'">Users Data</button>
+            <button class="btn btn-secondary w-50" onclick="location.href='shiftsPage.html'">Shifts Data</button>
+        </div>
 
+    </div>
 
-    </body>
+</body>
+
 </html>

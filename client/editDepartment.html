@@ -2,6 +2,9 @@
 <html>
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script>
 
         const departmentsURL = 'http://localhost:3000/departments';
@@ -181,36 +184,40 @@
 </head>
 
 <body onload="pageDisplay()">
-    <h1>Edit Department Page</h1>
+    <div class="container mt-4">
 
-    <!-- Display user's full name -->
-    <p>Welcome, <span id="fullName"></span></p>
-    <!------------------------------>
+        <!-- welcome message -->
+        <div class="text-center mb-4">
+            <h3 class="mb-3">Welcome, <span id="fullName"></span></h3>
+            <button class="btn btn-danger" onclick="logout()">Log Out</button>
+        </div>
 
-    <!--log out option-->
-    <a href="" onclick="logout()">Log Out</a><br><br>
-    <!------------------>
+        <h3>Edit Department:</h3>
 
-    <!--form to edit the selected employee-->
-    <form id="employeeForm">
-        Department Name: <input type="text" id="departmentName" required>
-        <br><br>
-        Manager Full Name: <input type="text" id="ManagerFullName" required>
-        </select> <br><br>
-    </form>
+        <!--form to edit the selected employee-->
+        <form id="departmentForm" class="row g-3">
+            <div class="col-md-4">
+                <label for="departmentName" class="form-label">Department Name</label>
+                <input type="text" id="departmentName" class="form-control" required>
+            </div>
 
-    <button type="button" onclick="updateDepartment()">Update</button>
-    <button type="button" onclick="deleteDepartment()">Delete</button> <br><br>
-    <!---------->
+            <div class="col-md-4">
+                <label for="ManagerFullName" class="form-label">Manager Full Name</label>
+                <input type="text" id="ManagerFullName" class="form-control" required>
+            </div>
+        </form> <br>
 
-    <!-- Register an employee for the department-->
-    Register an employee for the department: <br><br>
-    Choose Employee:<select id="employeesDropdown">
-        <option value="">All Employees</option>
-    </select> <br>
+        <button type="button" onclick="updateDepartment()" class="btn btn-secondary w-25">Update</button>
+        <button type="button" onclick="deleteDepartment()" class="btn btn-danger w-25">Delete</button> <br><br>
+        <!---------->
 
-    <button type="button" onclick="updateEmployeeDepartment()">Save</button> <br><br>
-    <!---------->
+        <!-- Register an employee for the department-->
+        <h3 class="mt-4">Register an employee for the department:</h3>
+        <select id="employeesDropdown" class="form-select" style="width: 150px;">
+            <option value="">Choose Employee</option>
+        </select>
+        <button type="button" onclick="updateEmployeeDepartment()" class="btn btn-secondary mt-3">Save</button> <br><br>
+    </div>
 
 </body>
 
