@@ -214,6 +214,7 @@
         <!-- welcome message -->
         <div class="text-center mb-4">
             <h3 class="mb-3">Welcome, <span id="fullName"></span></h3>
+            <button class="btn btn-secondary me-2" onclick="location.href='menuPage.html'">Menu</button>
             <button class="btn btn-danger" onclick="logout()">Log Out</button>
         </div>
 
@@ -236,17 +237,17 @@
 
             <div class="form-group">
                 <label for="shiftDate">Date</label>
-                <input type="date" id="shiftDate" class="form-control" style="width: 150px;" required>
+                <input type="date" id="shiftDate" class="form-control" style="width: 200px;" required>
             </div>
 
             <div class="form-group">
                 <label for="StartingHour">Starting Hour</label>
-                <input type="number" id="StartingHour" class="form-control" min="0" max="23" style="width: 150px;" required>
+                <input type="number" id="StartingHour" class="form-control" min="0" max="23" style="width: 200px;" required>
             </div>
 
             <div class="form-group">
                 <label for="EndingHour">Ending Hour</label>
-                <input type="number" id="EndingHour" class="form-control" min="0" max="23" style="width: 150px;" required>
+                <input type="number" id="EndingHour" class="form-control" min="0" max="23" style="width: 200px;" required>
             </div><br>
 
             <button type="button" onclick="addShift()" class="btn btn-secondary">Save New Shift</button>
@@ -265,7 +266,7 @@
 
             <div class="form-group col-md-6">
                 <label for="employeesDropdown" class="form-label">Choose Employee</label>
-                <select id="employeesDropdown" class="form-control" style="width: 150px;">
+                <select id="employeesDropdown" class="form-control" style="width: 200px;">
                     <option value="">All Employees</option>
                 </select>
             </div>
@@ -279,24 +280,24 @@
 
             <div class="form-group">
                 <label for="editShiftsDropdown" class="form-label">Choose Shift to Edit</label>
-                <select id="editShiftsDropdown" class="form-control" style="width: 150px;">
+                <select id="editShiftsDropdown" class="form-control" style="width: 200px;">
                     <option value="">Select Shift</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="editShiftDate">Date</label>
-                <input type="date" id="editShiftDate" class="form-control" style="width: 150px;"required>
+                <input type="date" id="editShiftDate" class="form-control" style="width: 200px;"required>
             </div>
 
             <div class="form-group">
                 <label for="editStartingHour">Starting Hour</label>
-                <input type="number" id="editStartingHour" class="form-control" min="0" max="23" style="width: 150px;" required>
+                <input type="number" id="editStartingHour" class="form-control" min="0" max="23" style="width: 200px;" required>
             </div>
 
             <div class="form-group">
                 <label for="editEndingHour">Ending Hour</label>
-                <input type="number" id="editEndingHour" class="form-control" min="0" max="23" style="width: 150px;"required>
+                <input type="number" id="editEndingHour" class="form-control" min="0" max="23" style="width: 200px;"required>
             </div><br>
 
             <button type="button" onclick="updateShift()" class="btn btn-secondary">Update Shift</button>

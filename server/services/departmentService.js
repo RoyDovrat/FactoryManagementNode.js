@@ -3,6 +3,9 @@ const employeeRepository = require('../repositories/employeeRepository')
 const employeeShiftRepository = require('../repositories/employeeShiftRepository')
 const { findManagerNameById, findShiftIds } = require('../utils/utils');
 
+const findEmployeesInDepartment = (departmentId, employees) => {
+  return employees.filter(employee => employee.DepartmentID.toString() === departmentId.toString())};
+
 const getAllDepartments = (filters) => {
   return departmentRepository.getAllDepartments(filters);
 };
@@ -26,36 +29,69 @@ const checkDepartmentExists = async (obj) => {
   const existingEmployees = await getAllDepartments();
 
   return existingEmployees.some(dep =>
-    dep.Name.toLowerCase() === obj.Name.toLowerCase() 
+    dep.Name.toLowerCase() === obj.Name.toLowerCase()
   );
 }
 
 const addDepartment = async (obj) => {
-  const DepartmentExists = await checkDepartmentExists(obj);
-
-  if (DepartmentExists) {
+  const departmentExists = await checkDepartmentExists(obj);
+  if (departmentExists) {
     throw new Error('Department with the same name already exists.');
   }
 
-  return departmentRepository.addDepartment(obj);
+  // find manager in employees, check if exists
+  const employees = await employeeRepository.getAllEmployees();
+  const manager = employees.find(emp => `${emp.FirstName} ${emp.LastName}` === obj.ManagerName);
+  if (!manager) {
+    throw new Error('Manager not found. Please ensure the name is correct.');
+  }
+
+  const newDepartment = await departmentRepository.addDepartment({
+    Name: obj.Name,
+    Manager: manager._id,
+  });
+
+  // update the manager's DepartmentID with the newly created department's _id
+  await employeeRepository.updateEmployee(manager._id, { DepartmentID: newDepartment._id });
+
+  return newDepartment;
 };
 
-/*
-const addDepartment = (obj) => {
-  return departmentRepository.addDepartment(obj);
-};
-*/
 
+const updateDepartment = async (id, obj) => {
+  const department = await departmentRepository.getDepartmentById(id);
 
-const updateDepartment = (id, obj) => {
-  return departmentRepository.updateDepartment(id, obj);
+  if (!department) {
+    throw new Error('Department not found.');
+  }
+
+  const employees = await employeeRepository.getAllEmployees();
+  const newManager = employees.find(emp => emp._id.toString() === obj.Manager.toString());
+
+  if (!newManager) {
+    throw new Error('Manager not found.');
+  }
+
+  // update the previous manager's DepartmentID to null if the manager has changed
+  if (department.Manager.toString() !== newManager._id.toString()) {
+    await employeeRepository.updateEmployee(department.Manager, { DepartmentID: null });
+  }
+
+  // update the new manager's DepartmentID
+  await employeeRepository.updateEmployee(newManager._id, { DepartmentID: id });
+
+  return departmentRepository.updateDepartment(id, {
+    Name: obj.Name,
+    Manager: newManager._id
+  });
 };
+
 
 const deleteDepartment = async (id) => {
   const employees = await employeeRepository.getAllEmployees();
   const employeesShifts = await employeeShiftRepository.getAllEmployeeShift();
 
-  const departmentEmployees = employees.filter(employee => employee.DepartmentID.toString() === id);
+  const departmentEmployees = findEmployeesInDepartment(id, employees);
   const employeeIds = departmentEmployees.map(employee => employee._id.toString());
 
   // Delete employee shifts
@@ -81,7 +117,7 @@ const getDepartmentsWithEmployees = async () => {
     const managerName = findManagerNameById(department.Manager, employees)
 
     // find employees who belong to this department
-    const departmentEmployees = employees.filter(employee => employee.DepartmentID.toString() === department._id.toString());
+    const departmentEmployees =  findEmployeesInDepartment(department._id, employees);
     const employeesDetails = departmentEmployees.map(employee => ({
       employeeId: employee._id,
       employeeName: `${employee.FirstName} ${employee.LastName}`
