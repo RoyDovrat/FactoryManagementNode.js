@@ -1,7 +1,7 @@
 const departmentRepository = require('../repositories/departmentRepository');
 const employeeRepository = require('../repositories/employeeRepository')
 const employeeShiftRepository = require('../repositories/employeeShiftRepository')
-const { findManagerNameById, findShiftIds } = require('../utils/utils');
+const { findManagerNameById, findShiftIds, isEmployeeManager } = require('../utils/utils');
 
 const findEmployeesInDepartment = (departmentId, employees) => {
   return employees.filter(employee => employee.DepartmentID.toString() === departmentId.toString())};
@@ -64,17 +64,17 @@ const updateDepartment = async (id, obj) => {
   if (!department) {
     throw new Error('Department not found.');
   }
+  
+  const isManager = await isEmployeeManager(obj.Manager);
+  if (isManager) {
+    throw new Error("This employee is a manager.");
+  }
 
   const employees = await employeeRepository.getAllEmployees();
   const newManager = employees.find(emp => emp._id.toString() === obj.Manager.toString());
 
   if (!newManager) {
     throw new Error('Manager not found.');
-  }
-
-  // update the previous manager's DepartmentID to null if the manager has changed
-  if (department.Manager.toString() !== newManager._id.toString()) {
-    await employeeRepository.updateEmployee(department.Manager, { DepartmentID: null });
   }
 
   // update the new manager's DepartmentID

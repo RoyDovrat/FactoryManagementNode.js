@@ -1,1 +1,88 @@
-{"actions":[{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":68},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":67},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":66},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":65},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":64},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":63},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":62},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":61},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":60},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":59},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":58},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":57},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":56},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":55},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":54},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":53},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":52},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":51},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":50},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":49},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":48},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":47},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":46},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":45},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":44},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":43},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":42},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":41},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":40},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":39},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":38},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":37},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":36},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":35},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":34},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":33},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":32},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":31},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":30},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":29},{"id":1,"date":"24/11/2024","maxAction":100,"actionsAllowd":28},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":74},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":73},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":72},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":99},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":98},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":97},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":96},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":95},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":94},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":93},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":92},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":91},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":90},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":89},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":88},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":87},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":86},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":85},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":84},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":83},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":82},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":81},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":80},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":79},{"id":1,"date":"25/11/2024","maxAction":100,"actionsAllowd":78}]}
+{
+    "actions": [
+        {
+            "id": 1,
+            "date": "24/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 68
+        },
+        {
+            "id": 1,
+            "date": "24/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 67
+        },
+        {
+            "id": 1,
+            "date": "24/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 66
+        },
+        {
+            "id": 1,
+            "date": "24/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 65
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 99
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 98
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 97
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 96
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 95
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 94
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 93
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 92
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 91
+        },
+        {
+            "id": 1,
+            "date": "25/11/2024",
+            "maxAction": 100,
+            "actionsAllowd": 90
+        }
+    ]
+}

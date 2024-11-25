@@ -1,3 +1,5 @@
+const departmentRepository = require('../repositories/departmentRepository');
+
 const findManagerNameById = (managerId, employees) => {
   const manager = employees.find(emp => emp._id.toString() === managerId.toString());
   return manager ? `${manager.FirstName} ${manager.LastName}` : 'Unknown';
@@ -34,7 +36,8 @@ const findDepartmentNameById = (departments, departmentId) => {
   return { departmentId, departmentName }
 };
 
-const isEmployeeManager = async (departments, employeeId) => {
+const isEmployeeManager = async (employeeId) => {
+  const departments = await departmentRepository.getAllDepartments();
   return departments.some(department => department.Manager.toString() === employeeId.toString());
 };
 
